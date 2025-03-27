@@ -1,2 +1,2 @@
 # KahootFrontend
-WAT PWSI group project, frontend 
+WAT PZ group project, frontend 
