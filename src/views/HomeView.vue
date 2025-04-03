@@ -21,7 +21,8 @@
               />
             </div>
           </div>
-          
+
+          <!-- Left arrow to scroll quizes -->
           <div class="quiz-slider">
             <n-button 
               quaternary 
@@ -65,6 +66,7 @@
               </div>
             </div>
             
+            <!-- Right arrow to scroll quizes -->
             <n-button 
               quaternary 
               circle 
@@ -76,7 +78,8 @@
                 <n-icon><ChevronForwardIcon /></n-icon>
               </template>
             </n-button>
-            
+
+            <!-- Pagination Dots on the bottom  -->
             <div class="pagination-dots">
               <span 
                 v-for="(_, index) in likedQuizChunks" 
@@ -327,7 +330,7 @@ const yourSortOptions = [
   { label: 'Popularity', value: 'popularity' }
 ];
 
-// Quiz data - added more items to demonstrate pagination
+// Quiz data - static for testing
 const likedQuizzes = ref([
   { title: 'Star Wars', image: 'https://via.placeholder.com/300x150/0000FF/FFFFFF?text=Star+Wars' },
   { title: 'Marvel', image: 'https://via.placeholder.com/300x150/FF0000/FFFFFF?text=Marvel' },
@@ -337,7 +340,16 @@ const likedQuizzes = ref([
   { title: 'Game of Thrones', image: 'https://via.placeholder.com/300x150/00FFFF/000000?text=GoT' },
   { title: 'Breaking Bad', image: 'https://via.placeholder.com/300x150/FFFFFF/000000?text=Breaking+Bad' },
   { title: 'Stranger Things', image: 'https://via.placeholder.com/300x150/888888/FFFFFF?text=Stranger+Things' },
-  { title: 'The Office', image: 'https://via.placeholder.com/300x150/123456/FFFFFF?text=The+Office' }
+  { title: 'The Office', image: 'https://via.placeholder.com/300x150/123456/FFFFFF?text=The+Office' },
+  { title: 'Star Wars', image: 'https://via.placeholder.com/300x150/0000FF/FFFFFF?text=Star+Wars' },
+  { title: 'Marvel', image: 'https://via.placeholder.com/300x150/FF0000/FFFFFF?text=Marvel' },
+  { title: 'DC Comics', image: 'https://via.placeholder.com/300x150/00FF00/FFFFFF?text=DC+Comics' },
+  { title: 'Harry Potter', image: 'https://via.placeholder.com/300x150/FFFF00/000000?text=Harry+Potter' },
+  { title: 'Lord of the Rings', image: 'https://via.placeholder.com/300x150/FF00FF/FFFFFF?text=LOTR' },
+  { title: 'Game of Thrones', image: 'https://via.placeholder.com/300x150/00FFFF/000000?text=GoT' },
+  { title: 'Breaking Bad', image: 'https://via.placeholder.com/300x150/FFFFFF/000000?text=Breaking+Bad' },
+  { title: 'Stranger Things', image: 'https://via.placeholder.com/300x150/888888/FFFFFF?text=Stranger+Things' },
+  { title: 'The Office', image: 'https://via.placeholder.com/300x150/123456/FFFFFF?text=The+Office' },
 ]);
 
 const suggestedQuizzes = ref([
@@ -483,7 +495,7 @@ const toggleJoinModal = () => {
 .cards-page {
   display: flex;
   gap: 15px;
-  flex: 0 0 100%;
+  flex: 0 0 93%;
   padding: 0 40px;
   justify-content: flex-start;
 }
@@ -576,6 +588,10 @@ const toggleJoinModal = () => {
   background-color: #004d1a !important;
   display: flex;
   justify-content: space-between !important;
+}
+
+.sort-dropdown span {
+  white-space: nowrap;
 }
 
 :deep(.n-modal) {

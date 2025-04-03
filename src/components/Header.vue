@@ -35,6 +35,7 @@ import { NButton, NIcon, NDropdown, NAvatar, NLayoutHeader } from 'naive-ui'
 import { Add as AddIcon, PersonAdd as PersonAddIcon } from '@vicons/ionicons5'
 import { CompassOutline as CompassOutlineIcon } from '@vicons/ionicons5'
 
+// Opcje ustawień przy kliknieciu profilu użytkownika
 const dropdownOptions = [
   {
     label: 'Settings',
@@ -56,7 +57,7 @@ const dropdownOptions = [
 
 const handleSelect = (key) => {
   console.log(`Selected: ${key}`)
-  // Handle dropdown selection here
+  // Tutaj Dodać logike do ustawień profilu
 }
 </script>
 
