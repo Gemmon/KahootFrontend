@@ -1,6 +1,5 @@
 <template>
   <div class="home">
-    <Header />
     
     <main class="main-content">
       <div class="quiz-collections">
@@ -277,9 +276,8 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, computed } from 'vue';
-import Header from '@/components/Header.vue';
 import { 
   NCard, 
   NButton, 
@@ -425,9 +423,10 @@ const toggleJoinModal = () => {
 
 <style scoped>
 .home {
-  min-height: 100vh;
+  min-height: 100%;
   background-color: #333;
   color: white;
+  flex-grow: 1;
 }
 
 .main-content {
