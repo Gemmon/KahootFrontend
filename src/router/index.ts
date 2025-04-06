@@ -7,6 +7,11 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('../views/HomeView.vue'),
+    },
+    {
+      path: '/lobby-guest',
+      name: 'lobby-guest',
+      component: () => import('../views/LobbyGuestView.vue')
     }
   ],
 })
