@@ -1,7 +1,7 @@
 <template>
   <n-layout-header class="main-header">
     <div class="header-left">
-      <div class="logo">
+      <div class="logo" @click="goToHome">
         <span class="logo-letter">G</span>
       </div>
       <nav class="main-nav">
@@ -36,7 +36,7 @@
             <n-button type="primary" class="join-button" @click="handleJoin">Join</n-button>
           </div>
         </n-popover>
-        <n-button class="nav-btn" quaternary type="primary">
+        <n-button @click="goToExplore" class="nav-btn" quaternary type="primary">
           <template #icon><n-icon><CompassOutlineIcon /></n-icon></template>
           Explore
         </n-button>
@@ -54,6 +54,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router';
 import { 
   NButton, 
   NIcon, 
@@ -107,6 +108,16 @@ const handleJoin = () => {
     console.log('No code entered')
   }
 }
+const router = useRouter();
+
+const goToHome = () =>{
+
+router.push('/')
+}
+const goToExplore = () =>{
+
+  router.push('/explore')
+}
 </script>
 
 <style scoped>
@@ -126,6 +137,8 @@ const handleJoin = () => {
 }
 
 .logo {
+  cursor: pointer;
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
