@@ -10,7 +10,7 @@
             <!-- Renders each user row dynamically -->
             <div class="user-row" v-for="(row, index) in userRows" :key="index">
               <!-- Renders each user card with specific class based on host or special guest -->
-              <div class="user-card" :class="{ 'host-card': isHost(user), 'special-guest': isSpecialGuest(user) }" v-for="(user, idx) in row" :key="idx">
+              <div class="user-card" :class="{ 'host-card': isHost(user)}" v-for="(user, idx) in row" :key="idx">
                   <img class="avatar-img" :src="avatarUrl" alt="User Avatar" />
                   <p>{{ user }}</p>
               </div>
@@ -45,6 +45,11 @@
             <n-button type="error" size="large">
               Leave
             </n-button>
+            <!-- Start button functionality -->
+            <n-button type="success" size="large">
+              Start
+            </n-button>
+            
           </div>
         </div>
       </div>
@@ -67,7 +72,6 @@ const users = ref([
 
 // Function to check if the user is a host or a special guest
 const isHost = (user: string) => user === 'John Doe';
-const isSpecialGuest = (user: string) => user === 'Jane Doe';
 
 const chosenQuiz = ref({
   title: 'Star Wars',
@@ -169,7 +173,7 @@ div {
 }
 
 /* Special guest: blue border */
-.user-card.special-guest .avatar-img {
+.user-card.host-card .avatar-img {
   border-color: #129BD5;
 }
 
