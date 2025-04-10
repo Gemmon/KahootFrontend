@@ -23,7 +23,7 @@
       </div>
 
       <div class="quiz-cards-container">
-        <transition name="fade-slide" mode="out-in">
+        <transition :name="`fade-slide-${transitionDirection}`" mode="out-in">
           <div :key="CurrentPage">
             <div class="cards-page" :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
               <div class="quiz-card" v-for="(quiz, index) in activeChunk"
@@ -145,15 +145,20 @@ const chunkArray = (array, size: number) => {
 const QuizChunks = computed(() => chunkArray(Quizzes.value, (itemsPerRow.value * itemsPerColumn.value)));
 const activeChunk = computed(() => QuizChunks.value[CurrentPage.value]);
 
+
+const transitionDirection = ref<'left' | 'right'>('left');
+
 // Navigation methods
 const nextPage = () => {
   if (CurrentPage.value < QuizChunks.value.length - 1) {
+    transitionDirection.value = 'left';
     CurrentPage.value++;
   }
 };
 
 const prevPage = () => {
   if (CurrentPage.value > 0) {
+    transitionDirection.value = 'right';
     CurrentPage.value--;
   }
 };
@@ -182,10 +187,10 @@ const goToPage = (pageIndex: number) => {
   margin: auto auto;
   width: 80vw;
   padding: 10px 20px;
-  height: 100%;
 }
 
 .quiz-cards-container {
+  overflow: hidden;
   width: 100%;
   height: 100%;
 }
@@ -302,21 +307,35 @@ h4 {
 }
 
 :deep(.n-select) {
-  width: max-content;
+  width: 20ch;
 }
 
-.fade-slide-enter-active,
-.fade-slide-leave-active {
-  transition: opacity 0.3s ease, transform 0.3s ease;
+/* Slide left (next) */
+.fade-slide-left-enter-active,
+.fade-slide-left-leave-active {
+  transition: all 0.4s ease;
 }
-
-.fade-slide-enter-from {
+.fade-slide-left-enter-from {
   opacity: 0;
-  transform: translateX(30px);
+  transform: translateX(100%);
+}
+.fade-slide-left-leave-to {
+  opacity: 0;
+  transform: translateX(-100%);
 }
 
-.fade-slide-leave-to {
-  opacity: 0;
-  transform: translateX(-30px);
+/* Slide right (prev) */
+.fade-slide-right-enter-active,
+.fade-slide-right-leave-active {
+  transition: all 0.4s ease;
 }
+.fade-slide-right-enter-from {
+  opacity: 0;
+  transform: translateX(-100%);
+}
+.fade-slide-right-leave-to {
+  opacity: 0;
+  transform: translateX(100%);
+}
+
 </style>
