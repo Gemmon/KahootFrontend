@@ -168,7 +168,7 @@ const goToPage = (pageIndex: number) => {
     transitionDirection.value = 'right';
   else
     transitionDirection.value = 'left';
-  
+
   CurrentPage.value = pageIndex;
 };
 
@@ -257,12 +257,15 @@ const goToPage = (pageIndex: number) => {
 
 .toolbar-container {
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   padding: 1rem 0;
+  gap: 1rem;
 }
 
 #dropdown-options {
   display: flex;
+  flex-wrap: wrap;
   gap: 1rem;
 
 }
