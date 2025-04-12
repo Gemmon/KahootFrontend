@@ -202,24 +202,24 @@ const goToPage = (pageIndex: number) => {
 
 
 .cards-page {
+
+  --grid-min-col-size: 200px;
+  --grid-gap: 1rem;
+
+  --grid-col-size-calc: calc((100% - var(--grid-gap) * var(--itemsPerRow)) / var(--itemsPerRow));
+  --grid-col-min-size-calc: min(100%, max(var(--grid-min-col-size), var(--grid-col-size-calc)));
+
+
   width: 100%;
   display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(var(--itemsPerColumn), 1fr);
-  grid-template-rows: repeat(var(--itemsPerRow), 1fr);
+  gap: var(--grid-gap);
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-col-min-size-calc),1fr));
+
 }
 
 .quiz-card {
   height: 20vh;
 }
-
-/* .cards-page {
-  display: flex;
-  gap: 15px;
-  flex: 1 1 1;
-  padding: 0 40px;
-  justify-content: flex-start;
-} */
 
 .pagination-dots {
   display: flex;
