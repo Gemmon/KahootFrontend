@@ -41,7 +41,7 @@ const props = defineProps<{
 .quiz-image {
   width: 100%;
   height: 100%;
-  background-size: cover;
+  background-size:auto;
   background-position: center;
   position: relative;
   display: flex;

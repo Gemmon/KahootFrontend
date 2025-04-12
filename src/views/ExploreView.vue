@@ -164,6 +164,11 @@ const prevPage = () => {
 };
 
 const goToPage = (pageIndex: number) => {
+  if (CurrentPage.value > pageIndex)
+    transitionDirection.value = 'right';
+  else
+    transitionDirection.value = 'left';
+  
   CurrentPage.value = pageIndex;
 };
 
