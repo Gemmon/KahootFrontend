@@ -4,7 +4,7 @@
       <div class="logo">
         <span class="logo-letter">G</span>
       </div>
-      <nav class="main-nav">
+      <nav class="main-nav" v-if="isLogged">
         <n-button class="nav-btn" quaternary type="primary">
           <template #icon><n-icon><AddIcon /></n-icon></template>
           Create
@@ -43,22 +43,17 @@
       </nav>
     </div>
     <div class="header-right">
-      <n-dropdown trigger="click" :options="dropdownOptions" @select="handleSelect">
-        <div class="user-profile">
-          <n-avatar round src="https://placehold.co/40" />
-        </div>
-      </n-dropdown>
+      <LoggedAvatar />
     </div>
   </n-layout-header>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import LoggedAvatar from '@/components/LoggedAvatar.vue'
 import { 
   NButton, 
   NIcon, 
-  NAvatar, 
-  NDropdown, 
   NLayoutHeader,
   NPopover,
   NInput
@@ -69,32 +64,10 @@ import {
 } from '@vicons/ionicons5'
 import { CompassOutline as CompassOutlineIcon } from '@vicons/ionicons5'
 
+const isLogged = ref(false)
 const joinCode = ref('')
 const showJoinPopover = ref(false)
 const errorMessage = ref('')
-
-const dropdownOptions = [
-  {
-    label: 'Settings',
-    key: 'settings'
-  },
-  {
-    label: 'History',
-    key: 'history'
-  },
-  {
-    label: 'Switch Accounts',
-    key: 'switch-accounts'
-  },
-  {
-    label: 'Log Out',
-    key: 'logout'
-  }
-]
-
-const handleSelect = (key) => {
-  console.log(`Selected: ${key}`)
-}
 
 const handleJoin = () => {
   if (joinCode.value.trim()) {
@@ -150,10 +123,6 @@ const handleJoin = () => {
 .nav-btn {
   color: white !important;
   font-size: 16px;
-}
-
-.user-profile {
-  cursor: pointer;
 }
 
 :deep(.n-dropdown-menu) {
