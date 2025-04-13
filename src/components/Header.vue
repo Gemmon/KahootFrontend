@@ -4,7 +4,7 @@
       <div class="logo">
         <span class="logo-letter">G</span>
       </div>
-      <nav class="main-nav" v-if="isLogged">
+      <nav class="main-nav" v-if="props.isLogged">
         <n-button class="nav-btn" quaternary type="primary">
           <template #icon><n-icon><AddIcon /></n-icon></template>
           Create
@@ -43,14 +43,14 @@
       </nav>
     </div>
     <div class="header-right">
-      <LoggedAvatar />
+      <Avatar v-bind:isLogged="isLogged" />
     </div>
   </n-layout-header>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import LoggedAvatar from '@/components/LoggedAvatar.vue'
+import Avatar from '@/components/Avatar.vue'
 import { 
   NButton, 
   NIcon, 
@@ -64,7 +64,11 @@ import {
 } from '@vicons/ionicons5'
 import { CompassOutline as CompassOutlineIcon } from '@vicons/ionicons5'
 
-const isLogged = ref(false)
+
+const props = defineProps<{
+  isLogged: Boolean
+}>()
+
 const joinCode = ref('')
 const showJoinPopover = ref(false)
 const errorMessage = ref('')

@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import { ref } from 'vue';
 import { RouterLink, RouterView } from 'vue-router'
 import Header from '@/components/Header.vue';
+
+const isLogged = ref(false)
 </script>
 
 <template>
-  <Header />
+  <Header v-bind:isLogged="isLogged" />
   <div class="page-content">
     <RouterView />
   </div>
