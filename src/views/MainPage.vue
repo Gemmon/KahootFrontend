@@ -4,8 +4,8 @@
 </template>
 
 <script setup lang="ts">
-import GuestHome from '@/components/GuestHome.vue';
-import LoggedHome from '@/components/LoggedHome.vue';
+import GuestHome from '@/views/GuestHome.vue';
+import LoggedHome from '@/views/LoggedHome.vue';
 
 const props = defineProps<{
     isLogged: Boolean
