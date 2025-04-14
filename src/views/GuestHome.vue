@@ -2,22 +2,33 @@
   <div class="main">
     <n-card class="quiz-section" content-style="padding: 0">
       <div class="quiz-section-header">
-        <h3>Quiz Explorer</h3>
-        <h4>Search, sort and filter for quizzes you want to play</h4>
-
-        <div class="toolbar-container">
-          <div id="search">
-            <n-input placeholder="Search..." v-model:value="SearchFor" size="small" :clearable="true" />
+        <div class="title-quotes">
+          <h3>View quizzes or Join friends!</h3>
+          <h4>Search for interesting quizzes or enter a code to join your friends in a lobby!</h4>
+        </div>
+        <div id="join-container">
+          <h3 class="join-title">Enter Code</h3>
+            <n-input 
+              v-model:value="joinCode" 
+              type="text" 
+              :placeholder="errorMessage ? errorMessage : 'Code'" 
+              class="join-input"
+            />
+            <n-button type="primary" class="join-button" @click="handleJoin">Join</n-button>
+        </div>
+      </div>
+      <div class="toolbar-container">
+        <div id="search">
+          <n-input placeholder="Search..." v-model:value="SearchFor" size="small" :clearable="true" />
+        </div>
+        <div id="dropdown-options">
+          <div class="dropdown" id="sort">
+            <span>Sort by:</span>
+            <n-select v-model:value="SortBy" :options="SortOptions" size="small" />
           </div>
-          <div id="dropdown-options">
-            <div class="dropdown" id="sort">
-              <span>Sort by:</span>
-              <n-select v-model:value="SortBy" :options="SortOptions" size="small" />
-            </div>
-            <div class="dropdown" id="filter">
-              <span>Filter by:</span>
-              <n-select v-model:value="FilterBy" :options="FilterOptions" size="small" />
-            </div>
+          <div class="dropdown" id="filter">
+            <span>Filter by:</span>
+            <n-select v-model:value="FilterBy" :options="FilterOptions" size="small" />
           </div>
         </div>
       </div>
@@ -86,6 +97,18 @@ import { ChevronBack as ChevronBackIcon, ChevronForward as ChevronForwardIcon } 
 
 import QuizCard from '@/components/QuizCard.vue';
 
+const joinCode = ref('')
+const errorMessage = ref('')
+const handleJoin = () => {
+  if (joinCode.value.trim()) {
+    console.log(`Joining with code: ${joinCode.value}`)
+    errorMessage.value = ''
+
+  } else {
+    errorMessage.value = 'No such game!'
+    console.log('No code entered')
+  }
+}
 const SearchFor = ref("");
 const SortBy = ref("Alphabetical");
 const SortOptions = [
@@ -192,6 +215,43 @@ const goToPage = (pageIndex: number) => {
   margin: auto auto;
   width: 80vw;
   padding: 10px 20px;
+}
+
+.quiz-section-header{
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+#join-container{
+  background-color:#333;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 0.5rem;
+  border-radius: 5%;
+}
+.join-title {
+  color: white;
+  font-size: 18px;
+  margin: 0 0 12px 0;
+}
+
+.join-input {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.join-button {
+  width: 100%;
+  margin-top: 8px;
+  background-color: #333;
+  color: white;
+  border: 1px solid #006622;
+  border-radius: 4px;
+  padding: 6px 20px;
+  transition: background-color 0.2s;
 }
 
 .quiz-cards-container {
