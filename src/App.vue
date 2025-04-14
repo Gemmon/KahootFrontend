@@ -9,7 +9,9 @@ const isLogged = ref(false)
 <template>
   <Header v-bind:isLogged="isLogged" />
   <div class="page-content">
-    <RouterView />
+    <RouterView v-slot="{ Component }">
+      <component :is="Component" :isLogged="isLogged" />
+    </RouterView>
   </div>
 </template>
 
