@@ -5,10 +5,14 @@
         <span class="logo-letter">G</span>
       </div>
       <nav class="main-nav">
-        <n-button class="nav-btn" quaternary type="primary">
-          <template #icon><n-icon><AddIcon /></n-icon></template>
-          Create
-        </n-button>
+        <RouterLink to="/create-lobby">
+          <n-button class="nav-btn" quaternary type="primary">
+            <template #icon>
+              <n-icon><AddIcon /></n-icon>
+            </template>
+            Create
+          </n-button>
+        </RouterLink>
         <!-- Join Button with custom dropdown -->
         <n-popover 
           trigger="click" 
