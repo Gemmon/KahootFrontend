@@ -299,9 +299,9 @@ import { HeartFilled } from '@vicons/antd';
 
 // Reactive state
 const showJoinModal = ref(false);
-const likedSort = ref('popularity');
-const suggestedSort = ref('timeCreated');
-const yourSort = ref('reviews');
+const likedSort = ref('Najnowsze');
+const suggestedSort = ref('Najnowsze');
+const yourSort = ref('Najnowsze');
 
 // Pagination state
 const likedCurrentPage = ref(0);
