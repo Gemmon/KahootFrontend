@@ -12,6 +12,16 @@ const router = createRouter({
       path: '/explore',
       name: 'explore',
       component: () => import('../views/ExploreView.vue'),
+    },
+    {
+      path: '/lobby-guest',
+      name: 'lobby-guest',
+      component: () => import('../views/LobbyGuestView.vue')
+    },
+    {
+      path: '/lobby-host',
+      name: 'lobby-host',
+      component: () => import('../views/LobbyHostView.vue')
     }
   ],
 })
