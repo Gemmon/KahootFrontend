@@ -1,10 +1,10 @@
 <template>
   <n-layout-header class="main-header">
     <div class="header-left">
-      <div class="logo">
+      <div class="logo" @click="goToHome">
         <span class="logo-letter">G</span>
       </div>
-      <nav class="main-nav">
+      <nav class="main-nav" v-if="props.isLogged">
         <n-button class="nav-btn" quaternary type="primary">
           <template #icon><n-icon><AddIcon /></n-icon></template>
           Create
@@ -36,29 +36,25 @@
             <n-button type="primary" class="join-button" @click="handleJoin">Join</n-button>
           </div>
         </n-popover>
-        <n-button class="nav-btn" quaternary type="primary">
+        <n-button @click="goToExplore" class="nav-btn" quaternary type="primary">
           <template #icon><n-icon><CompassOutlineIcon /></n-icon></template>
           Explore
         </n-button>
       </nav>
     </div>
     <div class="header-right">
-      <n-dropdown trigger="click" :options="dropdownOptions" @select="handleSelect">
-        <div class="user-profile">
-          <n-avatar round src="https://placehold.co/40" />
-        </div>
-      </n-dropdown>
+      <Avatar v-bind:isLogged="isLogged" />
     </div>
   </n-layout-header>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router';
+import Avatar from '@/components/Avatar.vue'
 import { 
   NButton, 
   NIcon, 
-  NAvatar, 
-  NDropdown, 
   NLayoutHeader,
   NPopover,
   NInput
@@ -69,32 +65,14 @@ import {
 } from '@vicons/ionicons5'
 import { CompassOutline as CompassOutlineIcon } from '@vicons/ionicons5'
 
+
+const props = defineProps<{
+  isLogged: Boolean
+}>()
+
 const joinCode = ref('')
 const showJoinPopover = ref(false)
 const errorMessage = ref('')
-
-const dropdownOptions = [
-  {
-    label: 'Settings',
-    key: 'settings'
-  },
-  {
-    label: 'History',
-    key: 'history'
-  },
-  {
-    label: 'Switch Accounts',
-    key: 'switch-accounts'
-  },
-  {
-    label: 'Log Out',
-    key: 'logout'
-  }
-]
-
-const handleSelect = (key) => {
-  console.log(`Selected: ${key}`)
-}
 
 const handleJoin = () => {
   if (joinCode.value.trim()) {
@@ -106,6 +84,16 @@ const handleJoin = () => {
     errorMessage.value = 'No such game!'
     console.log('No code entered')
   }
+}
+const router = useRouter();
+
+const goToHome = () =>{
+
+router.push('/')
+}
+const goToExplore = () =>{
+
+  router.push('/explore')
 }
 </script>
 
@@ -126,6 +114,8 @@ const handleJoin = () => {
 }
 
 .logo {
+  cursor: pointer;
+  user-select: none;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -150,10 +140,6 @@ const handleJoin = () => {
 .nav-btn {
   color: white !important;
   font-size: 16px;
-}
-
-.user-profile {
-  cursor: pointer;
 }
 
 :deep(.n-dropdown-menu) {
