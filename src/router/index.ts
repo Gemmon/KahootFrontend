@@ -22,6 +22,11 @@ const router = createRouter({
       path: '/lobby-host',
       name: 'lobby-host',
       component: () => import('../views/LobbyHostView.vue')
+    },
+    {
+      path: '/invidual',
+      name: 'invidual',
+      component: () => import('../views/InvidualQuiz.vue')
     }
   ],
 })
