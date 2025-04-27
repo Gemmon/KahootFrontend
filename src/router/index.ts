@@ -14,16 +14,22 @@ const router = createRouter({
       component: () => import('../views/ExploreView.vue'),
     },
     {
-      path: '/lobby-guest',
-      name: 'lobby-guest',
-      component: () => import('../views/LobbyGuestView.vue')
+      path: '/create-lobby',
+      name: 'create-lobby',
+      component: () => import('../views/CreateLobbyView.vue'),
     },
     {
       path: '/lobby-host',
       name: 'lobby-host',
-      component: () => import('../views/LobbyHostView.vue')
+      component: () => import('../views/LobbyHostView.vue'),
+    },
+    {
+      path: '/lobby-guest',
+      name: 'lobby-guest',
+      component: () => import('../views/LobbyGuestView.vue')
     }
   ],
 })
 
 export default router
+
