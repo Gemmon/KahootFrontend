@@ -7,19 +7,8 @@ const router = createRouter({
       path: '/',
       name: 'home',
       component: () => import('../views/HomeView.vue'),
-    },
-    {
-      path: '/create-lobby',
-      name: 'create-lobby',
-      component: () => import('../views/CreateLobbyView.vue'),
-    },
-    {
-      path: '/lobby-host',
-      name: 'lobby-host',
-      component: () => import('../views/LobbyHostView.vue'),
     }
   ],
 })
 
 export default router
-
