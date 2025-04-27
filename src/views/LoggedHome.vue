@@ -299,9 +299,9 @@ import { HeartFilled } from '@vicons/antd';
 
 // Reactive state
 const showJoinModal = ref(false);
-const likedSort = ref('popularity');
-const suggestedSort = ref('timeCreated');
-const yourSort = ref('reviews');
+const likedSort = ref('Najnowsze');
+const suggestedSort = ref('Najnowsze');
+const yourSort = ref('Najnowsze');
 
 // Pagination state
 const likedCurrentPage = ref(0);
@@ -311,21 +311,21 @@ const itemsPerPage = 4; // Number of cards visible at once
 
 // Select options
 const likedSortOptions = [
-  { label: 'Popularity', value: 'popularity' },
-  { label: 'Recently Added', value: 'recent' },
-  { label: 'Alphabetical', value: 'alphabetical' }
+  { label: 'Najnowsze', value: 'created_at' },  // na podstawie created_at z tabeli Quizzes
+  { label: 'Alfabetycznie', value: 'title' },   // na podstawie title z tabeli Quizzes
+  { label: 'Ocena', value: 'rating' }           // średnia z tabeli Ratings gdzie quiz_id = id quizu
 ];
 
 const suggestedSortOptions = [
-  { label: 'Time Created', value: 'timeCreated' },
-  { label: 'Popularity', value: 'popularity' },
-  { label: 'Relevance', value: 'relevance' }
+  { label: 'Najnowsze', value: 'created_at' }, // na podstawie created_at z tabeli Quizzes
+  { label: 'Alfabetycznie', value: 'title' },  // na podstawie title z tabeli Quizzes
+  { label: 'Popularne', value: 'popularity' }  //  można obliczyć na podstawie liczby Game_players/Games dla danego quiz_id
 ];
 
 const yourSortOptions = [
-  { label: 'Reviews', value: 'reviews' },
-  { label: 'Recently Added', value: 'recent' },
-  { label: 'Popularity', value: 'popularity' }
+  { label: 'Najnowsze', value: 'created_at' },  // na podstawie created_at z tabeli Quizzes
+  { label: 'Alfabetycznie', value: 'title' },   // na podstawie title z tabeli Quizzes
+  { label: 'Ocena', value: 'rating' }           // średnia z tabeli Ratings gdzie quiz_id = id quizu
 ];
 
 // Quiz data - static for testing
