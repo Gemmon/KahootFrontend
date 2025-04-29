@@ -99,6 +99,14 @@ const goToExplore = () =>{
 
   router.push('/explore')
 }
+const goToLogin = () =>{
+
+router.push('/login')
+}
+// const goToExplore = () =>{
+
+// router.push('/explore')
+// }
 </script>
 
 <style scoped>
