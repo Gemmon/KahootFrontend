@@ -27,6 +27,11 @@ const router = createRouter({
       path: '/lobby-guest',
       name: 'lobby-guest',
       component: () => import('../views/LobbyGuestView.vue')
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/LogInPageView.vue')
     }
   ],
 })
