@@ -14,6 +14,7 @@ import {
   NAvatar, 
   NDropdown, 
 } from 'naive-ui'
+import { useRouter } from 'vue-router';
 
 
 const props = defineProps<{
@@ -50,11 +51,15 @@ const dropdownOptionsLoggedOut = [
   }
 ]
 
-
+const router = useRouter()
 const handleSelect = (key: String) => {
-  console.log(`Selected: ${key}`)
+  if (String(key)== 'login')
+    goToLogin()
 }
 
+const goToLogin = () =>{
+  router.push('/login')
+}
 
 </script>
 
