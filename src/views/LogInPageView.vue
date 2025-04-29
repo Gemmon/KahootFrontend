@@ -29,7 +29,7 @@
         <n-button color="black" @click="handleEnterClick">
           Enter
         </n-button>
-        <span>or</span>
+        <span style="color:white">or</span>
         <n-button color="black" @click="handleSignUpClick">
           Sign Up
         </n-button>
