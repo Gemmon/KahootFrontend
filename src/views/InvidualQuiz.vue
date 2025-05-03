@@ -8,7 +8,7 @@
           <h1 class="quiz-title">{{ quiz.title }}</h1>
           
           <div class="quiz-actions">
-            <n-button quaternary circle class="like-button" @click="toggleLike">
+            <n-button quaternary circle class="like-button" :class="{ 'liked': isLiked }" @click="toggleLike">
               <template #icon>
                 <n-icon>
                   <component :is="isLiked ? HeartFilled : HeartOutline" />
@@ -23,7 +23,7 @@
               </template>
             </n-button>
             
-            <n-button quaternary circle class="back-button" @click="goBack">
+            <n-button type="default" circle class="back-button" @click="goBack">
               <template #icon>
                 <n-icon><ArrowBackIcon /></n-icon>
               </template>
@@ -229,16 +229,17 @@ const goToHome = () => {
 <style scoped>
 .quiz-view {
   display: flex;
-  min-height: 100vh;
   background-color: #333;
   color: white;
+  height: 100vh;
+  overflow: hidden;
 }
 
 .main-content {
   color: white;
   flex: 1;
   padding: 20px;
-  max-width: calc(100% - 260px); /* Zwiększono szerokość sidebar */
+  max-width: calc(100% - 280px); 
 }
 
 .quiz-container {
@@ -273,11 +274,11 @@ const goToHome = () => {
 
 .like-button {
   color: white !important;
-  font-size: 22px !important; 
+  font-size: 22px !important;
   border: 3px solid #004d1a !important;
   border-radius: 50% !important;
-  width: 48px !important;
-  height: 48px !important;
+  width: 50px !important;
+  height: 50px !important;
   display: flex !important;
   align-items: center !important;
   justify-content: center !important;
@@ -287,17 +288,28 @@ const goToHome = () => {
 
 .like-button:hover {
   background-color: rgba(0, 77, 26, 0.2) !important;
-  scale: 1.03 !important;
+}
+
+.like-button.liked {
+  background-color: #004d1a !important;
+  color: white !important;
+  border-color: #004d1a !important;
+  box-shadow: 0 0 8px rgba(0, 77, 26, 0.6) !important;
+}
+
+.like-button.liked:hover {
+  background-color: #003d15 !important;
+  scale: 1.03;
 }
 
 .start-button {
   background-color: #004d1a !important;
   border-radius: 12px !important;
-  padding: 5px 22px !important; 
-  font-size: 16px !important; 
+  padding: 5px 22px !important;
+  font-size: 16px !important;
   font-weight: bold !important;
   transition: all 0.3s ease !important;
-  height: 46px !important;
+  height: 50px !important;
 }
 
 .start-button:hover {
@@ -308,6 +320,14 @@ const goToHome = () => {
 .back-button {
   color: white !important;
   font-size: 18px !important;
+  border: 2px solid #555 !important;
+  background-color: rgba(0, 0, 0, 0.3) !important;
+  width: 50px !important;
+  height: 50px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: all 0.3s ease !important;
 }
 
 /* Question Section Styles */
