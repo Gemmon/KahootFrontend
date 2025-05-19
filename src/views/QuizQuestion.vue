@@ -14,6 +14,10 @@
                 :question="question"
                 :answers="answers"
                 :backgroundImage="backgroundImage"
+                :selectedAnswerId="selectedAnswerId"
+                :correctAnswerId="correctAnswerId"
+                :showResult="showResult"
+                @answerSelected="(id) => selectedAnswerId = id"
               />
             </div>
             <div class="image-column">
@@ -24,16 +28,27 @@
           </div>
         </div>
 
-        <TimerBar :timeRemaining="timeRemaining" :timeLimit="TIME_LIMIT" />
+        <TimerBar 
+          :timeRemaining="timeRemaining" 
+          :timeLimit="TIME_LIMIT" 
+          :showResult="showResult"
+          :isCorrect="selectedAnswerId === correctAnswerId"
+        />
       </div>
     </section>
   </main>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import QuestionCard from '../components/QuestionCard.vue';
 import TimerBar from '../components/TimerBar.vue';
+
+const selectedAnswerId = ref<string | null>(null);
+const correctAnswerId = 'C'; // na razie na sztywno, potem z backu
+const showResult = ref(false);
+
+const TIME_LIMIT = 15;
 
 defineProps<{
   title: string;
@@ -49,7 +64,6 @@ defineProps<{
   rightImage: string;
 }>();
 
-const TIME_LIMIT = 15;
 
 const mockProps = {
   title: 'Geografia Świata',
@@ -66,6 +80,17 @@ const mockProps = {
   backgroundImage: '/assets/Paris.jpg',
   rightImage: '/assets/Paris.jpg',
 };
+
+const {
+  title,
+  questionNumber,
+  totalQuestions,
+  question,
+  answers,
+  timeRemaining,
+  backgroundImage,
+  rightImage,
+} = mockProps;
 
 let timerId: number | undefined;
 
@@ -84,17 +109,11 @@ onBeforeUnmount(() => {
 });
 
 
-
-const {
-  title,
-  questionNumber,
-  totalQuestions,
-  question,
-  answers,
-  timeRemaining,
-  backgroundImage,
-  rightImage,
-} = mockProps;
+watch(timeRemaining, (newVal) => {
+  if (newVal === 0) {
+    showResult.value = true;
+  }
+});
 
 </script>
 

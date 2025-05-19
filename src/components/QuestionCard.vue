@@ -6,25 +6,22 @@
         <h2 class="question-text">{{ question }}</h2>
         <div class="answers-grid">
           <div class="answers-row">
-            <div class="answer-column" v-for="(answer, index) in answers.slice(0, 2)" :key="answer.id">
+            <div
+              class="answer-column"
+              v-for="(answer, index) in answers"
+              :key="answer.id"
+            >
               <div
                 class="answer-option"
-                :class="{ selected: selectedAnswerId === answer.id }"
+                :class="{
+                  selected: selectedAnswerId === answer.id && !showResult,
+                  correct: showResult && answer.id === correctAnswerId,
+                  wrong: showResult && selectedAnswerId === answer.id && answer.id !== correctAnswerId,
+                  disabled: showResult
+                }"
                 @click="selectAnswer(answer.id)"
               >
                 <span class="option-letter">{{ String.fromCharCode(65 + index) }}</span>
-                <p class="option-text">{{ answer.text }}</p>
-              </div>
-            </div>
-          </div>
-          <div class="answers-row">
-            <div class="answer-column" v-for="(answer, index) in answers.slice(2, 4)" :key="answer.id">
-              <div
-                class="answer-option"
-                :class="{ selected: selectedAnswerId === answer.id }"
-                @click="selectAnswer(answer.id)"
-              >
-                <span class="option-letter">{{ String.fromCharCode(67 + index) }}</span>
                 <p class="option-text">{{ answer.text }}</p>
               </div>
             </div>
@@ -36,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, defineProps, defineEmits } from "vue";
 
 const props = defineProps<{
   question: string;
@@ -45,20 +42,26 @@ const props = defineProps<{
     text: string;
   }[];
   backgroundImage: string;
+  selectedAnswerId: string | null;
+  correctAnswerId: string;
+  showResult: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: "answer-selected", answerId: string): void;
+  (e: "answerSelected", answerId: string): void;
 }>();
 
 const selectedAnswerId = ref<string | null>(null);
 
 function selectAnswer(id: string) {
+  if (props.showResult) {
+    // Jeśli pokazujemy wynik, blokujemy zmianę wyboru
+    return;
+  }
   selectedAnswerId.value = id;
   console.log("Wybrano odpowiedź:", id);
-  emit("answer-selected", id);
+  emit("answerSelected", id);
 }
-
 </script>
 
 <style scoped>
@@ -90,6 +93,23 @@ function selectAnswer(id: string) {
   font-weight: 700;
   box-shadow: 0 0 15px #17a935;
 }
+
+.answer-option.correct {
+  background-color: #80d4ff;
+  border: 2px solid #0088cc;
+}
+
+.answer-option.wrong {
+  background-color: #f88;
+  border: 2px solid #cc0000;
+}
+
+.answer-option.disabled {
+  cursor: not-allowed;
+  pointer-events: none; /* blokuje całkowicie kliknięcia */
+  user-select: none; /* blokuje zaznaczanie */
+}
+
 
 .question-wrapper {
   display: flex;
@@ -148,13 +168,14 @@ function selectAnswer(id: string) {
 
 .answers-row {
   display: flex;
+  flex-wrap: wrap;
   gap: 20px;
-  margin: 0;
   width: 100%;
+  margin: 0;
 }
 
 .answer-column {
-  width: 50%;
+  width: calc(50% - 10px); /* 2 kolumny, uwzględniając gap */
   box-sizing: border-box;
 }
 

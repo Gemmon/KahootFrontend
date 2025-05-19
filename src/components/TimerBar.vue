@@ -1,9 +1,27 @@
 <template>
   <section class="timer-section">
     <h3 class="timer-label">Pozostały czas</h3>
-    <div class="timer-bar">
-      <div class="timer-progress" :style="{ width: progressPercent + '%' }"></div>
-      <div class="timer-text">{{ timeRemaining }} sekund</div>
+    <div
+      class="bar-container"
+      :class="{
+        correct: showResult && isCorrect,
+        wrong: showResult && !isCorrect,
+        countdown: !showResult
+      }"
+    >
+      <div
+        class="bar-fill"
+        v-if="!showResult"
+        :style="{ width: progressPercent + '%' }"
+      ></div>
+      <div class="bar-text">
+        {{ showResult
+          ? isCorrect
+            ? 'Zdobyłeś 1000 punktów.'
+            : 'Nie zdobyłeś żadnych punktów.'
+          : timeRemaining + ' sekund'
+        }}
+      </div>
     </div>
   </section>
 </template>
@@ -14,12 +32,13 @@ import { computed } from 'vue';
 const props = defineProps<{
   timeRemaining: number;
   timeLimit: number;
+  showResult: boolean;
+  isCorrect: boolean;
 }>();
 
 const progressPercent = computed(() => {
   return (props.timeRemaining / props.timeLimit) * 100;
 });
-
 </script>
 
 <style scoped>
@@ -27,7 +46,7 @@ const progressPercent = computed(() => {
   width: 100%;
   display: flex;
   flex-direction: column;
-  align-items: center; /* wyśrodkowanie zawartości */
+  align-items: center;
 }
 
 .timer-label {
@@ -35,50 +54,62 @@ const progressPercent = computed(() => {
   font-family: "Libre Franklin", -apple-system, Roboto, Helvetica, sans-serif;
   font-size: 32px;
   font-weight: 600;
-  margin: 8px 0 8px;
+  margin: 8px 0;
 }
 
-
-.timer-bar {
+.bar-container {
   border-radius: 12px;
   border: 8px solid #47424e;
   background-color: #242227;
   display: flex;
-  padding: 1px;
-  overflow: hidden;
   align-items: center;
-  width: 100%; 
-  max-width: 600px;
-  position: relative;
-} 
-
-.timer-progress {
-  border-radius: 2px;
-  background-color: #17bd30;
-  height: 40px; /* wysokość paska */
-  width: 50%; /* ustaw to dynamicznie inline style z JS */
-  transition: width 0.3s ease; /* animacja zmiany szerokości */
-  position: relative;
-} 
-
-.timer-text {
-  position: absolute;
+  justify-content: center;
   width: 100%;
-  text-align: center;
+  max-width: 600px;
+  height: 40px;
+  position: relative;
+  overflow: hidden;
+  padding: 1px;
+  transition: background-color 0.3s ease;
+}
+
+.bar-container.countdown {
+  background-color: #242227;
+}
+
+.bar-container.correct {
+  background-color: #0066cc;
+}
+
+.bar-container.wrong {
+  background-color: #cc0000;
+}
+
+.bar-fill {
+  background-color: #17bd30;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  transition: width 0.3s ease;
+  z-index: 0;
+}
+
+.bar-text {
+  position: relative;
+  z-index: 1;
   font-family: "Libre Franklin", -apple-system, Roboto, Helvetica, sans-serif;
   font-size: 24px;
   font-weight: 700;
   color: #ffffff;
-  pointer-events: none; /* żeby nie przeszkadzało klikaniu */
+  width: 100%;
+  text-align: center;
+  pointer-events: none;
 }
 
 @media (max-width: 991px) {
-  .timer-bar {
-    padding-right: 0px;
-  }
-
-  .timer-progress {
-    padding: 18px 0;
+  .bar-container {
+    height: 60px;
   }
 }
 </style>
