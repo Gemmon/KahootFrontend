@@ -6,30 +6,26 @@
         <h2 class="question-text">{{ question }}</h2>
         <div class="answers-grid">
           <div class="answers-row">
-            <div class="answer-column">
-              <div class="answer-option">
-                <span class="option-letter">A</span>
-                <p class="option-text">{{ answers[0].text }}</p>
-              </div>
-            </div>
-            <div class="answer-column">
-              <div class="answer-option">
-                <span class="option-letter">B</span>
-                <p class="option-text">{{ answers[1].text }}</p>
+            <div class="answer-column" v-for="(answer, index) in answers.slice(0, 2)" :key="answer.id">
+              <div
+                class="answer-option"
+                :class="{ selected: selectedAnswerId === answer.id }"
+                @click="selectAnswer(answer.id)"
+              >
+                <span class="option-letter">{{ String.fromCharCode(65 + index) }}</span>
+                <p class="option-text">{{ answer.text }}</p>
               </div>
             </div>
           </div>
           <div class="answers-row">
-            <div class="answer-column">
-              <div class="answer-option">
-                <span class="option-letter">C</span>
-                <p class="option-text">{{ answers[2].text }}</p>
-              </div>
-            </div>
-            <div class="answer-column">
-              <div class="answer-option">
-                <span class="option-letter">D</span>
-                <p class="option-text">{{ answers[3].text }}</p>
+            <div class="answer-column" v-for="(answer, index) in answers.slice(2, 4)" :key="answer.id">
+              <div
+                class="answer-option"
+                :class="{ selected: selectedAnswerId === answer.id }"
+                @click="selectAnswer(answer.id)"
+              >
+                <span class="option-letter">{{ String.fromCharCode(67 + index) }}</span>
+                <p class="option-text">{{ answer.text }}</p>
               </div>
             </div>
           </div>
@@ -40,8 +36,9 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 
-defineProps<{
+const props = defineProps<{
   question: string;
   answers: {
     id: string;
@@ -49,10 +46,24 @@ defineProps<{
   }[];
   backgroundImage: string;
 }>();
+
+const emit = defineEmits<{
+  (e: "answer-selected", answerId: string): void;
+}>();
+
+const selectedAnswerId = ref<string | null>(null);
+
+function selectAnswer(id: string) {
+  selectedAnswerId.value = id;
+  console.log("Wybrano odpowiedź:", id);
+  emit("answer-selected", id);
+}
+
 </script>
 
 <style scoped>
 .question-container {
+  cursor: pointer;
   border-radius: 12px;
   border: 8px solid #47424e;
   background-color: #fff;
@@ -66,6 +77,18 @@ defineProps<{
   width: 100%;
   height: 100%;
   box-sizing: border-box;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.answer-option:hover {
+  background-color: #98c977;
+}
+
+.answer-option.selected {
+  background-color: #17a935;
+  color: white;
+  font-weight: 700;
+  box-shadow: 0 0 15px #17a935;
 }
 
 .question-wrapper {
@@ -161,11 +184,10 @@ defineProps<{
 @media (max-width: 991px) {
   .question-container {
     max-width: 100%;
-    margin-top: 38px;
   }
 
   .question-content {
-    padding: 37px 20px;
+    padding: 10px 10px;
   }
 
   .answers-row {

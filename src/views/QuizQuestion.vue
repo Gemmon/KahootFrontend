@@ -24,15 +24,16 @@
           </div>
         </div>
 
-        <TimerBar :timeText="timeRemaining + ' sekund'" />
+        <TimerBar :timeRemaining="timeRemaining" :timeLimit="TIME_LIMIT" />
       </div>
     </section>
   </main>
 </template>
 
 <script setup lang="ts">
+import { ref, onMounted, onBeforeUnmount } from 'vue';
 import QuestionCard from '../components/QuestionCard.vue';
-import TimerBar from '../components/TimeBar.vue';
+import TimerBar from '../components/TimerBar.vue';
 
 defineProps<{
   title: string;
@@ -48,6 +49,8 @@ defineProps<{
   rightImage: string;
 }>();
 
+const TIME_LIMIT = 15;
+
 const mockProps = {
   title: 'Geografia Świata',
   questionNumber: 3,
@@ -59,10 +62,28 @@ const mockProps = {
     { id: 'C', text: 'Paryż' },
     { id: 'D', text: 'Rzym' },
   ],
-  timeRemaining: 15,
+  timeRemaining: ref(TIME_LIMIT),
   backgroundImage: '/assets/Paris.jpg',
   rightImage: '/assets/Paris.jpg',
 };
+
+let timerId: number | undefined;
+
+onMounted(() => {
+  timerId = setInterval(() => {
+    if (timeRemaining.value > 0) {
+      timeRemaining.value--;
+    } else {
+      clearInterval(timerId);
+    }
+  }, 1000);
+});
+
+onBeforeUnmount(() => {
+  clearInterval(timerId);
+});
+
+
 
 const {
   title,
@@ -211,7 +232,7 @@ const {
   }
 
   .right-image-container {
-    margin-top: 38px;
+    margin-top: 0px;
   }
 
   .right-image {
