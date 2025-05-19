@@ -27,6 +27,11 @@ const router = createRouter({
       path: '/lobby-guest',
       name: 'lobby-guest',
       component: () => import('../views/LobbyGuestView.vue')
+    },
+    {
+      path: '/question',
+      name: 'question',
+      component: () => import('../views/QuizQuestion.vue')
     }
   ],
 })
