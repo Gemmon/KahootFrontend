@@ -371,7 +371,7 @@ const yourQuizzes = ref([
 
 
 // Helper function to chunk an array into smaller arrays
-const chunkArray = (array, size) => {
+const chunkArray = (array: any[], size: number) => {
   const chunked = [];
   for (let i = 0; i < array.length; i += size) {
     chunked.push(array.slice(i, i + size));
@@ -385,7 +385,7 @@ const suggestedQuizChunks = computed(() => chunkArray(suggestedQuizzes.value, it
 const yourQuizChunks = computed(() => chunkArray(yourQuizzes.value, itemsPerPage));
 
 // Navigation methods
-const nextPage = (section) => {
+const nextPage = (section: any) => {
   if (section === 'liked' && likedCurrentPage.value < likedQuizChunks.value.length - 1) {
     likedCurrentPage.value++;
   } else if (section === 'suggested' && suggestedCurrentPage.value < suggestedQuizChunks.value.length - 1) {
@@ -395,7 +395,7 @@ const nextPage = (section) => {
   }
 };
 
-const prevPage = (section) => {
+const prevPage = (section: any) => {
   if (section === 'liked' && likedCurrentPage.value > 0) {
     likedCurrentPage.value--;
   } else if (section === 'suggested' && suggestedCurrentPage.value > 0) {
@@ -405,7 +405,7 @@ const prevPage = (section) => {
   }
 };
 
-const goToPage = (section, pageIndex) => {
+const goToPage = (section: any, pageIndex: number) => {
   if (section === 'liked') {
     likedCurrentPage.value = pageIndex;
   } else if (section === 'suggested') {

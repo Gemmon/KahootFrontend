@@ -156,7 +156,7 @@ const Quizzes = ref([
 
 
 // Helper function to chunk an array into smaller arrays
-const chunkArray = (array, size: number) => {
+const chunkArray = (array: any, size: number) => {
   const chunked = [];
   for (let i = 0; i < array.length; i += size) {
     chunked.push(array.slice(i, i + size));
