@@ -231,8 +231,9 @@ const goToHome = () => {
   display: flex;
   background-color: #333;
   color: white;
-  height: 100vh;
-  overflow: hidden;
+  height: calc(100vh - 60px);
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .main-content {
@@ -335,7 +336,7 @@ const goToHome = () => {
   background-size: cover;
   background-position: center;
   border-radius: 12px; 
-  overflow: hidden;
+  overflow: auto;
   margin-bottom: 20px;
   position: relative;
   min-height: 300px;

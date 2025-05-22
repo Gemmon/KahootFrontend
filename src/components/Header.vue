@@ -109,8 +109,7 @@ const goToExplore = () =>{
   background-color: #004d1a;
   padding: 10px 20px;
   color: white;
-  height: 8vh;
-  min-height: 45px;
+  height: 60px;
 }
 
 .header-left {
