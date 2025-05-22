@@ -4,15 +4,31 @@
       <div class="creator-container">
         <!-- Header Section -->
         <div class="creator-header">
-          <h1 class="creator-title">{{ quizData.title || 'Star Wars' }}</h1>
+          <h1 class="creator-title">{{ quizData.title || 'Nowy Quiz' }}</h1>
           
           <div class="creator-actions">
-            <n-button type="success" class="publish-button" @click="publishQuiz">
-              Opublikuj
+            <n-button type="info" class="edit-description-button" @click="showDescriptionModal = true">
+              <template #icon>
+                <n-icon><EditIcon /></n-icon>
+              </template>
+              Edytuj Opis
             </n-button>
             
-            <n-button type="error" class="cancel-button" @click="cancelCreation">
-              Anuluj Tworzenie
+            <n-button 
+              :type="isEditMode ? 'warning' : 'success'" 
+              class="action-button" 
+              @click="isEditMode ? saveChanges() : publishQuiz()"
+            >
+              <template #icon>
+                <n-icon>
+                  <component :is="isEditMode ? SaveIcon : PublishIcon" />
+                </n-icon>
+              </template>
+              {{ isEditMode ? 'Zapisz Zmiany' : 'Opublikuj' }}
+            </n-button>
+            
+            <n-button type="error" class="cancel-button" @click="cancelAction">
+              {{ isEditMode ? 'Anuluj Edycję' : 'Anuluj Tworzenie' }}
             </n-button>
           </div>
         </div>
@@ -112,7 +128,7 @@
     
     <!-- Questions List Sidebar -->
     <div class="questions-sidebar">
-      <div class="sidebar-header">Lista pytań</div>
+      <div class="sidebar-header">Lista Pytań</div>
       
       <div class="questions-list">
         <div 
@@ -151,11 +167,71 @@
         </div>
       </div>
     </div>
+
+    <!-- Description Edit Modal -->
+    <n-modal v-model:show="showDescriptionModal">
+      <n-card
+        style="width: 600px"
+        title="Edytuj Opis Quizu"
+        :bordered="false"
+        size="huge"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div class="description-edit-form">
+          <div class="form-field">
+            <label>Tytuł Quizu</label>
+            <n-input 
+              v-model:value="editForm.title"
+              placeholder="Wprowadź tytuł quizu"
+              size="large"
+            />
+          </div>
+          
+          <div class="form-field">
+            <label>Opis Quizu</label>
+            <n-input
+              v-model:value="editForm.description"
+              type="textarea"
+              placeholder="Wprowadź opis quizu"
+              :rows="4"
+            />
+          </div>
+          
+          <div class="form-field">
+            <label>Zdjęcie Quizu</label>
+            <n-upload
+              :file-list="[]"
+              :show-file-list="false"
+              @change="handleQuizImageUpload"
+              accept="image/*"
+            >
+              <n-button type="primary" ghost>
+                <template #icon>
+                  <n-icon><ImageIcon /></n-icon>
+                </template>
+                Wybierz zdjęcie
+              </n-button>
+            </n-upload>
+            <div v-if="editForm.image" class="image-preview">
+              <img :src="editForm.image" alt="Quiz preview" />
+            </div>
+          </div>
+        </div>
+        
+        <template #footer>
+          <div class="modal-actions">
+            <n-button @click="showDescriptionModal = false">Anuluj</n-button>
+            <n-button type="primary" @click="saveDescription">Zapisz</n-button>
+          </div>
+        </template>
+      </n-card>
+    </n-modal>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, watch } from 'vue';
+import { ref, reactive, computed, watch, onMounted } from 'vue';
 import { 
   NCard, 
   NButton, 
@@ -163,18 +239,45 @@ import {
   NInputNumber,
   NIcon,
   NUpload,
-  NText
+  NText,
+  NModal
 } from 'naive-ui';
 import { 
   Image as ImageIcon,
   Add as PlusIcon,
-  Trash as TrashIcon
+  Trash as TrashIcon,
+  Create as EditIcon,
+  Save as SaveIcon,
+  CloudUpload as PublishIcon
 } from '@vicons/ionicons5';
 
-// Quiz data structure
+// Props to determine if we're in edit mode and what quiz to edit
+interface Props {
+  editMode?: boolean;
+  quizToEdit?: any; // Typ quizu z Twojej aplikacji
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  editMode: false,
+  quizToEdit: null
+});
+
+// Reactive state
+const isEditMode = ref(props.editMode);
+const showDescriptionModal = ref(false);
+
+// Form for editing description/basic info
+const editForm = reactive({
+  title: '',
+  description: '',
+  image: ''
+});
+
+// Quiz data structure - will be populated based on mode
 const quizData = reactive({
-  title: 'Star Wars', // Przykładowy tytuł z Pinia storage
-  description: 'To jest przykładowy opis quizu. Możesz przeczytać ten opis, aby dowiedzieć się więcej o tym quizie.', // Z Pinia storage
+  title: '',
+  description: '',
+  image: '',
   pointsPerQuestion: 1000,
   timePerQuestion: 30,
   questions: [
@@ -192,6 +295,26 @@ const currentQuestionIndex = ref(0);
 // Current question computed property
 const currentQuestionData = computed(() => {
   return quizData.questions[currentQuestionIndex.value];
+});
+
+// Initialize data based on mode
+onMounted(() => {
+  if (isEditMode.value && props.quizToEdit) {
+    // Load existing quiz data
+    Object.assign(quizData, props.quizToEdit);
+    Object.assign(editForm, {
+      title: props.quizToEdit.title,
+      description: props.quizToEdit.description,
+      image: props.quizToEdit.image
+    });
+  } else {
+    // Initialize with default data for new quiz
+    Object.assign(editForm, {
+      title: quizData.title || '',
+      description: quizData.description || '',
+      image: quizData.image || ''
+    });
+  }
 });
 
 // Methods
@@ -225,7 +348,7 @@ const setCorrectAnswer = (index: number) => {
 };
 
 const handleImageUpload = (data: any) => {
-  // Handle image upload logic here
+  // Handle question image upload
   if (data.file && data.file.file) {
     const reader = new FileReader();
     reader.onload = (e) => {
@@ -237,32 +360,75 @@ const handleImageUpload = (data: any) => {
   }
 };
 
-const publishQuiz = () => {
+const handleQuizImageUpload = (data: any) => {
+  // Handle quiz main image upload
+  if (data.file && data.file.file) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      if (e.target?.result) {
+        editForm.image = e.target.result as string;
+      }
+    };
+    reader.readAsDataURL(data.file.file);
+  }
+};
+
+const saveDescription = () => {
+  quizData.title = editForm.title;
+  quizData.description = editForm.description;
+  quizData.image = editForm.image;
+  showDescriptionModal.value = false;
+};
+
+const validateQuiz = () => {
+  // Check if quiz has title
+  if (!quizData.title.trim()) {
+    alert('Quiz musi mieć tytuł');
+    return false;
+  }
+
   // Check if all questions have text and at least one answer
   for (let i = 0; i < quizData.questions.length; i++) {
     const question = quizData.questions[i];
     if (!question.text.trim()) {
       alert(`Pytanie ${i + 1} nie ma tekstu`);
-      return;
+      return false;
     }
     
     const hasAnswer = question.answers.some(answer => answer.trim() !== '');
     if (!hasAnswer) {
       alert(`Pytanie ${i + 1} nie ma żadnej odpowiedzi`);
-      return;
+      return false;
     }
   }
+  
+  return true;
+};
+
+const publishQuiz = () => {
+  if (!validateQuiz()) return;
   
   // Here you would send the data to your backend
   console.log('Publishing quiz:', quizData);
   alert('Quiz został opublikowany!');
 };
 
-const cancelCreation = () => {
-  // Logic to cancel and go back
-  if (confirm('Czy na pewno chcesz anulować tworzenie quizu? Wszystkie zmiany zostaną utracone.')) {
+const saveChanges = () => {
+  if (!validateQuiz()) return;
+  
+  // Here you would update the existing quiz in your backend
+  console.log('Saving changes to quiz:', quizData);
+  alert('Zmiany zostały zapisane!');
+};
+
+const cancelAction = () => {
+  const message = isEditMode.value 
+    ? 'Czy na pewno chcesz anulować edycję? Wszystkie niezapisane zmiany zostaną utracone.'
+    : 'Czy na pewno chcesz anulować tworzenie quizu? Wszystkie zmiany zostaną utracone.';
+    
+  if (confirm(message)) {
+    console.log(isEditMode.value ? 'Cancelling quiz edit' : 'Cancelling quiz creation');
     // Navigate back or reset form
-    console.log('Cancelling quiz creation');
   }
 };
 </script>
@@ -309,8 +475,8 @@ const cancelCreation = () => {
   gap: 12px;
 }
 
-.publish-button {
-  background-color: #22c55e !important;
+.edit-description-button {
+  background-color: #3b82f6 !important;
   border-radius: 12px !important;
   padding: 5px 22px !important;
   font-size: 16px !important;
@@ -319,9 +485,22 @@ const cancelCreation = () => {
   height: 50px !important;
 }
 
-.publish-button:hover {
+.edit-description-button:hover {
   transform: scale(1.05) !important;
-  box-shadow: 0 0 10px rgba(34, 197, 94, 0.5) !important;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5) !important;
+}
+
+.action-button {
+  border-radius: 12px !important;
+  padding: 5px 22px !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  transition: all 0.3s ease !important;
+  height: 50px !important;
+}
+
+.action-button:hover {
+  transform: scale(1.05) !important;
 }
 
 .cancel-button {
@@ -339,38 +518,6 @@ const cancelCreation = () => {
   box-shadow: 0 0 10px rgba(239, 68, 68, 0.5) !important;
 }
 
-/* Basic Info Section */
-.quiz-basic-info {
-  margin-bottom: 20px;
-}
-
-.info-card {
-  background-color: #444 !important;
-  border-radius: 12px !important;
-}
-
-.info-card h3 {
-  color: white;
-  margin-bottom: 16px;
-  font-size: 18px;
-}
-
-.basic-info-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.info-field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.info-field label {
-  color: white;
-  font-weight: bold;
-}
-
 /* Question Display Section */
 .question-display-section {
   margin-bottom: 20px;
@@ -383,7 +530,7 @@ const cancelCreation = () => {
   overflow: hidden;
   position: relative;
   min-height: 350px;
-  border: 2px solid #22c55e;
+  border: 2px solid #004d1a;
 }
 
 .question-preview::before {
@@ -411,16 +558,16 @@ const cancelCreation = () => {
 }
 
 .question-input {
-  background-color: #22c55e !important;
+  background-color: #004d1a !important;
   border-radius: 10px !important;
 }
 
 .question-input :deep(.n-input__input-el) {
-  background-color: #22c55e !important;
+  background-color: #004d1a !important;
   color: white !important;
   font-size: 20px !important;
   font-weight: bold !important;
-  padding: 18px !important;
+  margin: 10px 5px;
 }
 
 .question-input :deep(.n-input__input-el)::placeholder {
@@ -454,11 +601,11 @@ const cancelCreation = () => {
 }
 
 .answer-card.correct {
-  background-color: #22c55e;
-  color: black;
-  border-color: #16a34a;
+  background-color: #004d1a;
+  color: white;
+  border-color: #003311;
   transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(34, 197, 94, 0.5);
+  box-shadow: 0 4px 12px rgba(0, 77, 26, 0.5);
 }
 
 .answer-label {
@@ -470,7 +617,7 @@ const cancelCreation = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: #22c55e;
+  background-color: #004d1a;
   color: white;
   border-radius: 50%;
   flex-shrink: 0;
@@ -478,7 +625,7 @@ const cancelCreation = () => {
 
 .answer-card.correct .answer-label {
   background-color: white;
-  color: #22c55e;
+  color: #004d1a;
 }
 
 .answer-input {
@@ -488,17 +635,12 @@ const cancelCreation = () => {
 .answer-input :deep(.n-input__input-el) {
   background-color: transparent !important;
   border: none !important;
-  color: black;
   color: inherit !important;
   font-size: 16px !important;
 }
 
 .answer-input :deep(.n-input__input-el)::placeholder {
   color: rgba(0, 0, 0, 0.5) !important;
-}
-
-.answer-card.correct .answer-input :deep(.n-input__input-el) {
-  color: black !important;
 }
 
 .answer-card.correct .answer-input :deep(.n-input__input-el)::placeholder {
@@ -509,20 +651,21 @@ const cancelCreation = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: auto;
 }
 
 .correct-answer-hint {
   color: rgba(255, 255, 255, 0.8);
-  font-size: 14px;
+  font-style: italic;
 }
 
-/* Stats Section */
+/* Quiz Statistics */
 .quiz-stats {
-  margin-top: 20px;
+  color: white;
+  margin-top: 24px;
 }
 
 .stats-card {
+  color: white;
   background-color: #444 !important;
   border-radius: 12px !important;
 }
@@ -530,7 +673,7 @@ const cancelCreation = () => {
 .stats-grid {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr;
-  gap: 20px;
+  gap: 24px;
   align-items: start;
 }
 
@@ -541,15 +684,18 @@ const cancelCreation = () => {
 }
 
 .stat-label {
-  color: white;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 16px;
+  color: white;
 }
 
 .stat-description {
-  color: rgba(255, 255, 255, 0.8);
+  padding: 12px;
+  background-color: #333;
+  border-radius: 8px;
   font-size: 14px;
   line-height: 1.4;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 .time-input {
@@ -560,7 +706,7 @@ const cancelCreation = () => {
 
 .time-input span {
   color: white;
-  font-size: 14px;
+  font-weight: bold;
 }
 
 /* Questions Sidebar */
@@ -570,7 +716,6 @@ const cancelCreation = () => {
   padding: 32px 24px;
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
 }
 
 .sidebar-header {
@@ -579,7 +724,7 @@ const cancelCreation = () => {
   padding: 12px;
   text-align: center;
   margin-bottom: 20px;
-  border-bottom: 2px solid #22c55e;
+  border-bottom: 2px solid #004d1a;
   color: white;
 }
 
@@ -607,9 +752,9 @@ const cancelCreation = () => {
 }
 
 .question-item.active {
-  border-color: #22c55e;
+  border-color: #004d1a;
   transform: scale(1.03);
-  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.5), 0 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 0 3px rgba(0, 77, 26, 0.5), 0 4px 10px rgba(0, 0, 0, 0.4);
 }
 
 .question-number {
@@ -624,7 +769,7 @@ const cancelCreation = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 3;
+  z-index: 2;
   font-size: 16px;
   font-weight: bold;
 }
@@ -636,8 +781,7 @@ const cancelCreation = () => {
   background-position: center;
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  align-items: flex-end;
   padding: 10px;
 }
 
@@ -653,18 +797,15 @@ const cancelCreation = () => {
 
 .question-preview-text {
   position: relative;
-  z-index: 2;
+  z-index: 1;
   color: white;
   font-size: 12px;
   font-weight: bold;
-  text-align: center;
-  line-height: 1.2;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
   overflow: hidden;
-  word-break: break-word;
-  hyphens: auto;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
 }
 
 .delete-question-btn {
@@ -682,19 +823,19 @@ const cancelCreation = () => {
 
 .add-question-item {
   height: 120px;
+  border: 2px dashed #004d1a;
   border-radius: 10px;
-  border: 2px dashed #22c55e;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
-  background-color: rgba(34, 197, 94, 0.1);
+  background-color: rgba(0, 77, 26, 0.1);
 }
 
 .add-question-item:hover {
-  background-color: rgba(34, 197, 94, 0.2);
-  transform: scale(1.02);
+  background-color: rgba(0, 77, 26, 0.2);
+  border-color: #006b24;
 }
 
 .add-question-content {
@@ -702,11 +843,47 @@ const cancelCreation = () => {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  color: #22c55e;
+  color: #004d1a;
   font-weight: bold;
 }
 
-/* Responsive Design */
+/* Modal Styles */
+.description-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-field label {
+  font-weight: bold;
+  color: #333;
+}
+
+.image-preview {
+  margin-top: 10px;
+}
+
+.image-preview img {
+  width: 100%;
+  max-width: 200px;
+  height: auto;
+  border-radius: 8px;
+  border: 2px solid #ddd;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .quiz-creator {
     flex-direction: column;
@@ -719,7 +896,6 @@ const cancelCreation = () => {
   .questions-sidebar {
     width: 100%;
     height: auto;
-    max-height: 200px;
   }
   
   .questions-list {
@@ -728,8 +904,7 @@ const cancelCreation = () => {
     padding-bottom: 10px;
   }
   
-  .question-item,
-  .add-question-item {
+  .question-item {
     min-width: 180px;
   }
   
@@ -737,17 +912,8 @@ const cancelCreation = () => {
     grid-template-columns: 1fr;
   }
   
-  .answers-grid {
-    grid-template-columns: 1fr;
-  }
-  
   .creator-title {
     font-size: 24px;
-  }
-  
-  .creator-header {
-    flex-direction: column;
-    gap: 12px;
   }
 }
 </style>

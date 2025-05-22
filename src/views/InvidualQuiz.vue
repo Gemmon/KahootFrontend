@@ -8,7 +8,7 @@
           <h1 class="quiz-title">{{ quiz.title }}</h1>
           
           <div class="quiz-actions">
-            <n-button quaternary circle class="like-button" :class="{ 'liked': isLiked }" @click="toggleLike">
+            <n-button quaternary circle class="like-button" :class="{ 'liked': isLiked }" @click="toggleLike" v-if="!mine">
               <template #icon>
                 <n-icon>
                   <component :is="isLiked ? HeartFilled : HeartOutline" />
@@ -20,6 +20,13 @@
               Start
               <template #icon>
                 <n-icon><PlayIcon /></n-icon>
+              </template>
+            </n-button>
+
+            <n-button type="warning" class="edit-button" @click="editQuiz" v-if="mine">
+              Edit
+              <template #icon>
+                <n-icon><EditIcon /></n-icon>
               </template>
             </n-button>
             
@@ -41,8 +48,11 @@
                 v-for="(answer, index) in currentQuestion.answers" 
                 :key="index"
                 class="answer-card"
-                :class="{ 'selected': selectedAnswer === index }"
-                @click="selectAnswer(index)"
+                :class="{ 
+                  'selected': mine ? currentQuestion.correctAnswer === index : selectedAnswer === index,
+                  'disabled': mine
+                }"
+                @click="!mine && selectAnswer(index)"
               >
                 <div class="answer-label">{{ ['A', 'B', 'C', 'D'][index] }}</div>
                 <div class="answer-text">{{ answer }}</div>
@@ -62,7 +72,7 @@
                 </div>
               </div>
               
-              <div class="rating-section">
+              <div class="rating-section" v-if="!mine">
                 <h3>Ocena</h3>
                 <div class="stars-display">
                   <n-rate v-model:value="quiz.rating" readonly />
@@ -76,6 +86,22 @@
                 <div class="rate-quiz">
                   <h4>Oceń ten Quiz</h4>
                   <n-rate v-model:value="userRating" />
+                </div>
+              </div>
+              
+              <div class="rating-section" v-else>
+                <h3>Statystyki</h3>
+                <div class="stats-display">
+                  <div class="stat-item">
+                    <span class="stat-label">Pytania:</span>
+                    <span class="stat-value">{{ quiz.questions.length }}</span>
+                  </div>
+                  <div class="stat-item">
+                    <span class="stat-label">Ocena:</span>
+                    <div class="stars-display">
+                      <n-rate v-model:value="quiz.rating" readonly />
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -95,7 +121,7 @@
           class="question-nav-item"
           :class="{ 
             'active': currentQuestionIndex === index,
-            'completed': completedQuestions.includes(index)
+            'completed': !mine && completedQuestions.includes(index)
           }"
           @click="navigateToQuestion(index)"
         >
@@ -121,9 +147,13 @@ import {
   Heart as HeartOutline, 
   Play as PlayIcon,
   GameController as GameControllerOutline,
-  ArrowBack as ArrowBackIcon
+  ArrowBack as ArrowBackIcon,
+  Pencil as EditIcon
 } from '@vicons/ionicons5';
 import { HeartFilled } from '@vicons/antd';
+
+// Test variable 
+const mine = ref(true);
 
 // Reactive state
 const isLiked = ref(false);
@@ -205,6 +235,11 @@ const startQuiz = () => {
   completedQuestions.value.length = 0;
 };
 
+const editQuiz = () => {
+  // Logic to edit the quiz
+  console.log('Editing quiz...');
+};
+
 const selectAnswer = (index: number) => {
   selectedAnswer.value = index;
   if (!completedQuestions.value.includes(currentQuestionIndex.value)) {
@@ -214,7 +249,9 @@ const selectAnswer = (index: number) => {
 
 const navigateToQuestion = (index: number) => {
   currentQuestionIndex.value = index;
-  selectedAnswer.value = null;
+  if (!mine.value) {
+    selectedAnswer.value = null;
+  }
 };
 
 const goBack = () => {
@@ -318,6 +355,22 @@ const goToHome = () => {
   box-shadow: 0 0 10px rgba(0, 77, 26, 0.5) !important;
 }
 
+.edit-button {
+  background-color: #ff8c00 !important;
+  border-radius: 12px !important;
+  padding: 5px 22px !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  transition: all 0.3s ease !important;
+  height: 50px !important;
+  color: white !important;
+}
+
+.edit-button:hover {
+  transform: scale(1.05) !important;
+  box-shadow: 0 0 10px rgba(255, 140, 0, 0.5) !important;
+}
+
 .back-button {
   color: white !important;
   font-size: 18px !important;
@@ -387,7 +440,7 @@ const goToHome = () => {
   font-size: 16px; 
 }
 
-.answer-card:hover {
+.answer-card:hover:not(.disabled) {
   background-color: rgba(255, 255, 255, 0.9);
   transform: translateY(-3px);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -398,6 +451,10 @@ const goToHome = () => {
   color: white;
   transform: translateY(-3px);
   box-shadow: 0 4px 12px rgba(0, 77, 26, 0.5);
+}
+
+.answer-card.disabled {
+  cursor: default;
 }
 
 .answer-label {
@@ -463,11 +520,11 @@ const goToHome = () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 18px; /* Zwiększono odstęp */
+  gap: 18px;
 }
 
 .stars-display {
-  font-size: 28px; /* Zwiększono rozmiar */
+  font-size: 28px;
 }
 
 .author-info {
@@ -486,6 +543,34 @@ const goToHome = () => {
 .rate-quiz h4 {
   font-size: 18px;
   margin-bottom: 8px;
+}
+
+.stats-display {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.stat-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background-color: #333;
+  border-radius: 8px;
+}
+
+.stat-label {
+  font-weight: bold;
+  font-size: 16px;
+}
+
+.stat-value {
+  font-size: 18px;
+  color: white;
+  font-weight: bold;
+
 }
 
 /* Question List Sidebar Styles */
