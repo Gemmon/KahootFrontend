@@ -41,21 +41,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { InformationCircleOutline } from '@vicons/ionicons5'
+import { NIcon } from 'naive-ui'
 
 const router = useRouter()
+const route = useRoute()
 
-const lobbyName = ref('')
-const mode = ref<'single' | 'multi'>('multi')
-
-const chosenQuiz = ref({
-  title: 'Star Wars',
-  image: 'https://placehold.co/480x264/0000FF/FFFFFF?text=Star+Wars'
-})
+const title = computed(() => route.query.title as string || 'No title')
+const image = computed(() => route.query.image as string || '')
+const chosenQuiz = computed(() => ({
+  title: title.value,
+  image: image.value
+}))
 
 const avatarUrl = 'https://placehold.co/40x40/avatar'
+const lobbyName = ref('')
+const mode = ref<'single' | 'multi'>('multi')
 
 const goToLobby = () => {
   router.push('/lobby-host')

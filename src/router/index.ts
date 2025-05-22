@@ -6,7 +6,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/views/MainPage.vue'),
+      component: () => import('@/views/QuizHistoryView.vue'),
     },
     {
       path: '/explore',
@@ -27,6 +27,11 @@ const router = createRouter({
       path: '/lobby-guest',
       name: 'lobby-guest',
       component: () => import('../views/LobbyGuestView.vue')
+    },
+    {
+      path: '/history-empty',
+      name: 'history-empty',
+      component: () => import('../views/QuizHistoryViewEmpty.vue'),
     }
   ],
 })
