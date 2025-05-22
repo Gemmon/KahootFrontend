@@ -127,10 +127,10 @@ import { HeartFilled } from '@vicons/antd';
 
 // Reactive state
 const isLiked = ref(false);
-const currentQuestionIndex = ref(0);
-const selectedAnswer = ref(null);
+const currentQuestionIndex = ref<number>(0);
+const selectedAnswer = ref<number | null>(null);
+const completedQuestions = ref<number[]>([])
 const userRating = ref(0);
-const completedQuestions = reactive([]);
 
 // Mock data for the quiz
 const quiz = reactive({
@@ -202,17 +202,17 @@ const startQuiz = () => {
   // Logic to start the quiz
   currentQuestionIndex.value = 0;
   selectedAnswer.value = null;
-  completedQuestions.length = 0;
+  completedQuestions.value.length = 0;
 };
 
-const selectAnswer = (index) => {
+const selectAnswer = (index: number) => {
   selectedAnswer.value = index;
-  if (!completedQuestions.includes(currentQuestionIndex.value)) {
-    completedQuestions.push(currentQuestionIndex.value);
+  if (!completedQuestions.value.includes(currentQuestionIndex.value)) {
+    completedQuestions.value.push(currentQuestionIndex.value);
   }
 };
 
-const navigateToQuestion = (index) => {
+const navigateToQuestion = (index: number) => {
   currentQuestionIndex.value = index;
   selectedAnswer.value = null;
 };
