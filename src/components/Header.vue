@@ -47,7 +47,7 @@
       </nav>
     </div>
     <div class="header-right">
-      <Avatar v-bind:isLogged="isLogged" />
+      <Avatar  v-bind:isLogged="isLogged" />
     </div>
   </n-layout-header>
 </template>
@@ -109,7 +109,8 @@ const goToExplore = () =>{
   background-color: #004d1a;
   padding: 10px 20px;
   color: white;
-  height: 60px;
+  height: 8vh;
+  min-height: 45px;
 }
 
 .header-left {
@@ -125,15 +126,15 @@ const goToExplore = () =>{
   justify-content: center;
   background-color: white;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   margin-right: 15px;
 }
 
 .logo-letter {
   color: #004d1a;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .main-nav {
@@ -143,7 +144,7 @@ const goToExplore = () =>{
 
 .nav-btn {
   color: white !important;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 :deep(.n-dropdown-menu) {
@@ -213,4 +214,5 @@ const goToExplore = () =>{
   align-self: center;
   font-weight: bold;
 }
+
 </style>
