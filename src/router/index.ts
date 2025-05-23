@@ -24,10 +24,20 @@ const router = createRouter({
       component: () => import('../views/LobbyHostView.vue')
     },
     {
-      path: '/invidual',
-      name: 'invidual',
+      path: '/individual',
+      name: 'individual',
       component: () => import('../views/InvidualQuiz.vue')
-    }
+    },
+    {
+      path: '/create-quiz',
+      name: 'create-quiz',
+      component: () => import('../views/CreateQuizView.vue')
+    },
+    {
+      path: '/quiz-questions',
+      name: 'quiz-questions',
+      component: () => import('../views/AddQuestionsToQuizView.vue')
+    },
   ],
 })
 

@@ -22,4 +22,5 @@ const isLogged = ref(true)
   min-height: calc(100vh - 60px);
   height: 100%;
 }
+
 </style>
