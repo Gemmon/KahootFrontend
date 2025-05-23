@@ -7,7 +7,13 @@
           <h1 class="creator-title">{{ quizData.title || 'Nowy Quiz' }}</h1>
           
           <div class="creator-actions">
-            <n-button type="info" class="edit-description-button" @click="showDescriptionModal = true">
+            <!-- Przycisk Edytuj Opis tylko w trybie edycji -->
+            <n-button 
+              v-if="isEditMode" 
+              type="info" 
+              class="edit-description-button" 
+              @click="showDescriptionModal = true"
+            >
               <template #icon>
                 <n-icon><EditIcon /></n-icon>
               </template>
@@ -254,11 +260,11 @@ import {
 // Props to determine if we're in edit mode and what quiz to edit
 interface Props {
   editMode?: boolean;
-  quizToEdit?: any; // Typ quizu z Twojej aplikacji
+  quizToEdit?: any;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  editMode: false,
+  editMode: true,
   quizToEdit: null
 });
 
@@ -643,6 +649,10 @@ const cancelAction = () => {
   color: rgba(0, 0, 0, 0.5) !important;
 }
 
+.answer-card.correct .answer-input :deep(.n-input__input-el) {
+  color: white !important;
+}
+
 .answer-card.correct .answer-input :deep(.n-input__input-el)::placeholder {
   color: rgba(255, 255, 255, 0.7) !important;
 }
@@ -677,112 +687,67 @@ const cancelAction = () => {
   align-items: start;
 }
 
-.stat-item {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.stat-label {
-  font-weight: bold;
-  font-size: 16px;
-  color: white;
-}
-
-.stat-description {
-  padding: 12px;
-  background-color: #333;
-  border-radius: 8px;
-  font-size: 14px;
-  line-height: 1.4;
-  color: rgba(255, 255, 255, 0.9);
-}
-
-.time-input {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.time-input span {
-  color: white;
-  font-weight: bold;
-}
-
 /* Questions Sidebar */
 .questions-sidebar {
   width: 280px;
-  background-color: #222;
-  padding: 32px 24px;
-  display: flex;
-  flex-direction: column;
+  background-color: #2a2a2a;
+  border-left: 1px solid #444;
+  padding: 20px;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .sidebar-header {
-  font-size: 20px;
+  font-size: 18px;
   font-weight: bold;
-  padding: 12px;
-  text-align: center;
   margin-bottom: 20px;
-  border-bottom: 2px solid #004d1a;
   color: white;
+  text-align: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #444;
 }
 
 .questions-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  flex: 1;
+  gap: 12px;
 }
 
 .question-item {
-  height: 120px;
-  border-radius: 10px;
-  overflow: hidden;
-  position: relative;
+  background-color: #333;
+  border-radius: 8px;
+  padding: 12px;
   cursor: pointer;
-  border: 2px solid transparent;
   transition: all 0.3s ease;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  border: 2px solid transparent;
+  position: relative;
 }
 
 .question-item:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+  background-color: #404040;
+  transform: translateX(5px);
 }
 
 .question-item.active {
   border-color: #004d1a;
-  transform: scale(1.03);
-  box-shadow: 0 0 0 3px rgba(0, 77, 26, 0.5), 0 4px 10px rgba(0, 0, 0, 0.4);
+  background-color: #1a4d26;
 }
 
 .question-number {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  width: 28px;
-  height: 28px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 2;
-  font-size: 16px;
   font-weight: bold;
+  font-size: 14px;
+  color: white;
+  margin-bottom: 8px;
 }
 
 .question-thumbnail {
-  width: 100%;
-  height: 100%;
   background-size: cover;
   background-position: center;
+  border-radius: 6px;
+  height: 80px;
   position: relative;
-  display: flex;
-  align-items: flex-end;
-  padding: 10px;
+  overflow: hidden;
+  margin-bottom: 8px;
 }
 
 .question-thumbnail::before {
@@ -792,27 +757,31 @@ const cancelAction = () => {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
 }
 
 .question-preview-text {
-  position: relative;
-  z-index: 1;
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  right: 8px;
   color: white;
   font-size: 12px;
-  font-weight: bold;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+  font-weight: 500;
+  z-index: 2;
+  line-height: 1.2;
   overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  max-width: 100%;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  word-wrap: break-word;
 }
 
 .delete-question-btn {
   position: absolute;
   top: 8px;
   right: 8px;
-  z-index: 3;
   background-color: rgba(239, 68, 68, 0.8) !important;
   color: white !important;
 }
@@ -822,20 +791,20 @@ const cancelAction = () => {
 }
 
 .add-question-item {
-  height: 120px;
-  border: 2px dashed #004d1a;
-  border-radius: 10px;
+  background-color: #333;
+  border: 2px dashed #666;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  background-color: rgba(0, 77, 26, 0.1);
 }
 
 .add-question-item:hover {
-  background-color: rgba(0, 77, 26, 0.2);
-  border-color: #006b24;
+  border-color: #004d1a;
+  background-color: #1a4d26;
 }
 
 .add-question-content {
@@ -843,8 +812,8 @@ const cancelAction = () => {
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  color: #004d1a;
-  font-weight: bold;
+  color: white;
+  font-weight: 500;
 }
 
 /* Modal Styles */
@@ -870,11 +839,10 @@ const cancelAction = () => {
 }
 
 .image-preview img {
-  width: 100%;
   max-width: 200px;
-  height: auto;
+  max-height: 120px;
   border-radius: 8px;
-  border: 2px solid #ddd;
+  object-fit: cover;
 }
 
 .modal-actions {
@@ -883,37 +851,36 @@ const cancelAction = () => {
   justify-content: flex-end;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .quiz-creator {
-    flex-direction: column;
-  }
-  
-  .main-content {
-    max-width: 100%;
-  }
-  
-  .questions-sidebar {
-    width: 100%;
-    height: auto;
-  }
-  
-  .questions-list {
-    flex-direction: row;
-    overflow-x: auto;
-    padding-bottom: 10px;
-  }
-  
-  .question-item {
-    min-width: 180px;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .creator-title {
-    font-size: 24px;
-  }
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stat-label {
+  font-weight: bold;
+  color: #ccc;
+  font-size: 14px;
+}
+
+.stat-description {
+  color: white;
+  background-color: #555;
+  padding: 10px;
+  border-radius: 6px;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+}
+
+.time-input {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.time-input span {
+  color: #ccc;
+  font-weight: bold;
 }
 </style>
