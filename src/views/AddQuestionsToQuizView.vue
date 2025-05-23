@@ -256,6 +256,9 @@ import {
   Save as SaveIcon,
   CloudUpload as PublishIcon
 } from '@vicons/ionicons5';
+import router from '@/router';
+import { useRoute } from 'vue-router';
+const route = useRoute();
 
 // Props to determine if we're in edit mode and what quiz to edit
 interface Props {
@@ -264,12 +267,15 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  editMode: true,
+  editMode: false,
   quizToEdit: null
 });
 
+
+
 // Reactive state
-const isEditMode = ref(props.editMode);
+const isEditMode = computed(() => route.query.mode === 'edit');
+const quizId = computed(() => route.query.id);
 const showDescriptionModal = ref(false);
 
 // Form for editing description/basic info
@@ -414,7 +420,7 @@ const validateQuiz = () => {
 const publishQuiz = () => {
   if (!validateQuiz()) return;
   
-  // Here you would send the data to your backend
+  // Here send the data to backend
   console.log('Publishing quiz:', quizData);
   alert('Quiz został opublikowany!');
 };
@@ -422,9 +428,11 @@ const publishQuiz = () => {
 const saveChanges = () => {
   if (!validateQuiz()) return;
   
-  // Here you would update the existing quiz in your backend
+  // Here update the existing quiz in backend
   console.log('Saving changes to quiz:', quizData);
   alert('Zmiany zostały zapisane!');
+  // Wracanie do strony quizu
+  router.back();
 };
 
 const cancelAction = () => {
@@ -434,7 +442,9 @@ const cancelAction = () => {
     
   if (confirm(message)) {
     console.log(isEditMode.value ? 'Cancelling quiz edit' : 'Cancelling quiz creation');
-    // Navigate back or reset form
+    isEditMode.value
+    ? router.push('/')
+    : router.back();
   }
 };
 </script>
@@ -608,7 +618,7 @@ const cancelAction = () => {
 
 .answer-card.correct {
   background-color: #004d1a;
-  color: white;
+  color: black;
   border-color: #003311;
   transform: translateY(-3px);
   box-shadow: 0 4px 12px rgba(0, 77, 26, 0.5);
@@ -650,7 +660,7 @@ const cancelAction = () => {
 }
 
 .answer-card.correct .answer-input :deep(.n-input__input-el) {
-  color: white !important;
+  color: black !important;
 }
 
 .answer-card.correct .answer-input :deep(.n-input__input-el)::placeholder {

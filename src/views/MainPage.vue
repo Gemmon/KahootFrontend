@@ -1,5 +1,5 @@
 <template>
-    <LoggedHome v-if="props.isLogged" />
+    <LoggedHome v-if="!props.isLogged" />
     <GuestHome v-else/>
 </template>
 

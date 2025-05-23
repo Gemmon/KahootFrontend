@@ -176,8 +176,7 @@ const isFormValid = computed(() => {
 
 // Methods
 const goBack = () => {
-  // Logic to go back to previous page
-  console.log('Going back...');
+  router.back();
 };
 
 const triggerFileInput = () => {
@@ -250,10 +249,8 @@ const proceedToNext = () => {
     image: quizData.image,
   });
 
-  router.push('/create-quiz/questions');
+  router.push({ name: 'quiz-questions', query: { mode: 'create' } });
   
-  // Clear success message after delay
-  //setTimeout(() => successMessage.value = '', 3000);
 };
 </script>
 

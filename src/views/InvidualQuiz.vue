@@ -151,7 +151,7 @@ import {
   Pencil as EditIcon
 } from '@vicons/ionicons5';
 import { HeartFilled } from '@vicons/antd';
-
+import router from '@/router';
 // Test variable 
 const mine = ref(true);
 
@@ -236,8 +236,10 @@ const startQuiz = () => {
 };
 
 const editQuiz = () => {
-  // Logic to edit the quiz
-  console.log('Editing quiz...');
+
+  // Przechodzenie do edycji pytań quizu
+  router.push({ name: 'quiz-questions', query: { mode: 'edit', id: 123 } })
+
 };
 
 const selectAnswer = (index: number) => {
@@ -255,12 +257,9 @@ const navigateToQuestion = (index: number) => {
 };
 
 const goBack = () => {
-  // Logic to go back to previous page
+  router.back();
 };
 
-const goToHome = () => {
-  // Logic to navigate home
-};
 </script>
 
 <style scoped>

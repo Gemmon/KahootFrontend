@@ -42,7 +42,7 @@
                     class="cards-page" 
                     :class="{ 'active-page': likedCurrentPage === chunkIndex }"
                   >
-                    <div class="quiz-card" v-for="(quiz, index) in chunk" :key="'liked-'+chunkIndex+'-'+index">
+                    <div class="quiz-card" v-for="(quiz, index) in chunk" :key="'liked-'+chunkIndex+'-'+index" >
                       <div class="quiz-image" :style="{ backgroundImage: `url(${quiz.image})` }">
                         <div class="quiz-actions">
                           <n-button quaternary circle>
@@ -52,7 +52,7 @@
                           </n-button>
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
-                        <n-button class="start-btn" block type="primary">
+                        <n-button class="start-btn" block type="primary" @click="goToQuiz(index)">
                           Start 
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
@@ -296,7 +296,7 @@ import {
   ChevronForward as ChevronForwardIcon
 } from '@vicons/ionicons5';
 import { HeartFilled } from '@vicons/antd';
-
+import router from '@/router';
 // Reactive state
 const showJoinModal = ref(false);
 const likedSort = ref('Najnowsze');
@@ -369,6 +369,11 @@ const yourQuizzes = ref([
   { title: 'Node.js', image: 'https://placehold.co/300x150/339933/FFFFFF?text=Node.js' }
 ]);
 
+
+const goToQuiz = (id: number): void => {
+  console.log("KLIK KLIK");
+  router.push({ name: 'individual', query: { mine: "true"} });
+};
 
 // Helper function to chunk an array into smaller arrays
 const chunkArray = (array: any[], size: number) => {

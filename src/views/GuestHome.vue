@@ -39,7 +39,7 @@
             <div class="cards-page" :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
               <div class="quiz-card" v-for="(quiz, index) in activeChunk"
                 :key="'quiz-' + CurrentPage + '-' + index">
-                <QuizCard :imageURL="quiz.image" :title="quiz.title" />
+                <QuizCard :imageURL="quiz.image" :title="quiz.title" @click="goToQuiz(quiz.id)"/>
               </div>
             </div>
           </div>
@@ -94,7 +94,7 @@ import {
   NText
 } from 'naive-ui';
 import { ChevronBack as ChevronBackIcon, ChevronForward as ChevronForwardIcon } from '@vicons/ionicons5';
-
+import router from '@/router';
 import QuizCard from '@/components/QuizCard.vue';
 
 const joinCode = ref('')
@@ -154,6 +154,9 @@ const Quizzes = ref([
   
 ]);
 
+const goToQuiz = (id: number): void => {
+  router.push({ name: 'individual', query: { mine: "true"} });
+};
 
 // Helper function to chunk an array into smaller arrays
 const chunkArray = (array: any, size: number) => {

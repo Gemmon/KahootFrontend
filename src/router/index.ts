@@ -25,7 +25,7 @@ const router = createRouter({
     },
     {
       path: '/individual',
-      name: '/individual',
+      name: 'individual',
       component: () => import('../views/InvidualQuiz.vue')
     },
     {
@@ -33,9 +33,9 @@ const router = createRouter({
       name: 'create-quiz',
       component: () => import('../views/CreateQuizView.vue')
     },
-        {
-      path: '/create-quiz/questions',
-      name: '/create-quiz-questions',
+    {
+      path: '/quiz-questions',
+      name: 'quiz-questions',
       component: () => import('../views/AddQuestionsToQuizView.vue')
     },
   ],
