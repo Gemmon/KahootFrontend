@@ -21,18 +21,28 @@ const router = createRouter({
     {
       path: '/lobby-host',
       name: 'lobby-host',
-      component: () => import('../views/LobbyHostView.vue'),
+      component: () => import('../views/LobbyHostView.vue')
     },
     {
-      path: '/lobby-guest',
-      name: 'lobby-guest',
-      component: () => import('../views/LobbyGuestView.vue')
+      path: '/individual',
+      name: 'individual',
+      component: () => import('../views/InvidualQuiz.vue')
+    },
+    {
+      path: '/create-quiz',
+      name: 'create-quiz',
+      component: () => import('../views/CreateQuizView.vue')
+    },
+    {
+      path: '/quiz-questions',
+      name: 'quiz-questions',
+      component: () => import('../views/AddQuestionsToQuizView.vue')
     },
     {
       path: '/history-empty',
       name: 'history-empty',
       component: () => import('../views/QuizHistoryViewEmpty.vue'),
-    }
+    },
   ],
 })
 

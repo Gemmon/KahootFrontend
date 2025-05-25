@@ -39,11 +39,7 @@
             <div class="cards-page" :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
               <div class="quiz-card" v-for="(quiz, index) in activeChunk"
                 :key="'quiz-' + CurrentPage + '-' + index">
-                <QuizCard
-                    :imageURL="quiz.image"
-                    :title="quiz.title"
-                    @start="goToCreateLobby(quiz)"
-                />
+                <QuizCard :imageURL="quiz.image" :title="quiz.title" @click="goToQuiz(quiz.id)"/>
               </div>
             </div>
           </div>
@@ -164,6 +160,9 @@ const Quizzes = ref([
   
 ]);
 
+const goToQuiz = (id: number): void => {
+  router.push({ name: 'individual', query: { mine: "true"} });
+};
 
 // Helper function to chunk an array into smaller arrays
 const chunkArray = (array: any, size: number) => {
