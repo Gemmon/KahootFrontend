@@ -6,7 +6,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/views/MainPage.vue'),
+      component: () => import('@/views/QuizHistoryView.vue'),
     },
     {
       path: '/explore',
@@ -37,6 +37,11 @@ const router = createRouter({
       path: '/quiz-questions',
       name: 'quiz-questions',
       component: () => import('../views/AddQuestionsToQuizView.vue')
+    },
+    {
+      path: '/history-empty',
+      name: 'history-empty',
+      component: () => import('../views/QuizHistoryViewEmpty.vue'),
     },
   ],
 })

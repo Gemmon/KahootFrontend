@@ -94,8 +94,14 @@ import {
   NText
 } from 'naive-ui';
 import { ChevronBack as ChevronBackIcon, ChevronForward as ChevronForwardIcon } from '@vicons/ionicons5';
-import router from '@/router';
+
 import QuizCard from '@/components/QuizCard.vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+const goToCreateLobby = (quiz: any) => {
+  router.push({ name: 'create-lobby', query: { title: quiz.title, image: quiz.image } });
+}
 
 const joinCode = ref('')
 const errorMessage = ref('')
