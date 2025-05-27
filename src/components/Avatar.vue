@@ -14,11 +14,15 @@ import {
   NAvatar, 
   NDropdown, 
 } from 'naive-ui'
+import { useRouter } from 'vue-router'
+const router = useRouter()
 
 
 const props = defineProps<{
   isLogged: Boolean
 }>()
+
+const userHasQuizHistory = ref(true) // TODO: zastąp prawdziwym warunkiem czy uzytkownik ma historię quizów
 
 const dropdownOptionsLogged = [
   {
@@ -51,10 +55,17 @@ const dropdownOptionsLoggedOut = [
 ]
 
 
-const handleSelect = (key: String) => {
+const handleSelect = (key: string) => {
   console.log(`Selected: ${key}`)
-}
 
+  if (key === 'history') {
+    if (userHasQuizHistory.value) {
+      router.push('/history')
+    } else {
+      router.push('/history-empty')
+    }
+  }
+}
 
 </script>
 

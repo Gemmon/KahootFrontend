@@ -5,14 +5,12 @@
         <span class="logo-letter">G</span>
       </div>
       <nav class="main-nav" v-if="props.isLogged">
-        <RouterLink to="/create-lobby">
-          <n-button class="nav-btn" quaternary type="primary">
-            <template #icon>
-              <n-icon><AddIcon /></n-icon>
-            </template>
-            Create
-          </n-button>
-        </RouterLink>
+        <n-button class="nav-btn" quaternary type="primary" @click="goToCreateQuiz">
+          <template #icon>
+            <n-icon><AddIcon /></n-icon>
+          </template>
+          Create
+        </n-button>
         <!-- Join Button with custom dropdown -->
         <n-popover 
           trigger="click" 
@@ -98,6 +96,10 @@ router.push('/')
 const goToExplore = () =>{
 
   router.push('/explore')
+}
+
+const goToCreateQuiz = () => {
+  router.push('/create-quiz')
 }
 </script>
 

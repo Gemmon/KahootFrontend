@@ -1,37 +1,17 @@
 <template>
   <div class="main">
-    <n-tabs v-model:value="activeTab" type="segment" animated class="tabs custom-tabs">
-      <n-tab-pane name="history" tab="Historia Quizów">
+        <h1 class="page-title">Historia Quizów</h1>
         <div class="history-wrapper">
-          <div class="history-header">
-            <p class="info-text">
-              Sprawdź 12 ostatnich quizów, w które grałeś! Możesz również usunąć swoją historię,
-              jeżeli chcesz zmienić sugerowane quizy.
-            </p>
-            <n-button type="error">Wyczyść historię</n-button>
-          </div>
-
           <div class="empty-placeholder">
             Zagraj w quizy,<br />
             żeby się tutaj pojawiły!
           </div>
         </div>
-      </n-tab-pane>
-
-      <n-tab-pane name="settings" tab="Ustawienia">
-        <div class="settings-panel">Ustawienia użytkownika (placeholder)</div>
-      </n-tab-pane>
-    </n-tabs>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
-import {
-  NButton, NTabs, NTabPane
-} from 'naive-ui'
 
-const activeTab = ref('history')
 </script>
 
 <style scoped>
@@ -42,28 +22,10 @@ const activeTab = ref('history')
   padding: 20px;
 }
 
-.tabs {
-  background-color: transparent;
-}
-
 .history-wrapper {
   background-color: #444;
   padding: 20px;
   border-radius: 8px;
-}
-
-.history-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20px;
-  flex-wrap: wrap;
-}
-
-.info-text {
-  color: white;
-  font-size: 14px;
-  margin-bottom: 16px;
 }
 
 .empty-placeholder {
@@ -77,33 +39,11 @@ const activeTab = ref('history')
   line-height: 1.5;
 }
 
-/* Zakładki */
-:deep(.custom-tabs .n-tabs-tab) {
-  background-color: #555;
+.page-title {
   color: white;
-  border-radius: 6px;
-  padding: 6px 16px;
-  transition: all 0.3s ease;
-}
-:deep(.custom-tabs .n-tabs-tab--active) {
-  background-color: #00cc66 !important;
-  color: white;
-}
-:deep(.n-tabs-segment),
-:deep(.n-tabs-wrapper),
-:deep(.n-tabs-nav-scroll-content),
-:deep(.n-tabs-segment-type),
-:deep(.n-tabs-segment__bar) {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-.settings-panel {
-  background-color: #444;
-  padding: 20px;
-  border-radius: 8px;
-  color: white;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 24px;
   text-align: center;
 }
 </style>

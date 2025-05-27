@@ -1,83 +1,61 @@
 <template>
   <div class="main">
-    <n-tabs v-model:value="activeTab" type="segment" animated class="tabs custom-tabs">
-      <n-tab-pane name="history" tab="Historia Quizów">
-        <div class="history-wrapper">
-          <div class="history-header">
-            <p class="info-text">
-              Sprawdź 12 ostatnich quizów, w które grałeś! Możesz również usunąć swoją historię,
-              jeżeli chcesz zmienić sugerowane quizy.
-            </p>
-            <n-button type="error" @click="clearHistory">Wyczyść historię</n-button>
-          </div>
+    <h1 class="page-title">Historia Quizów</h1>
 
-          <div class="slider-container">
-            <div class="quiz-cards" :style="{ transform: `translateX(-${currentPage * 100}%)` }">
-              <div class="cards-page" v-for="(chunk, chunkIndex) in quizChunks" :key="chunkIndex">
-                <div class="quiz-card" v-for="(quiz, index) in chunk" :key="index">
-                  <div class="quiz-image" :style="{ backgroundImage: `url(${quiz.image})` }">
-                    <div class="quiz-actions">
-                      <n-button quaternary circle>
-                        <template #icon>
-                          <n-icon><HeartOutline /></n-icon>
-                        </template>
-                      </n-button>
-                    </div>
-                    <div class="quiz-title">{{ quiz.title }}</div>
-                    <n-button class="start-btn" block type="primary" @click="startQuiz(quiz)">
-                      Start
-                      <template #icon>
-                        <n-icon><PlayIcon /></n-icon>
-                      </template>
-                    </n-button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+    <div class="history-wrapper">
+      <div class="history-header">
+        <p class="info-text">
+          Sprawdź 12 ostatnich quizów, w które grałeś! Możesz również usunąć swoją historię,
+          jeżeli chcesz zmienić sugerowane quizy.
+        </p>
+        <n-button type="error" @click="clearHistory">Wyczyść historię</n-button>
+      </div>
 
-          <div class="slider-controls">
-            <n-button
-                quaternary
-                circle
-                class="slider-arrow prev"
-                @click="prevPage"
-                :disabled="currentPage === 0"
-            >
-              <template #icon>
-                <n-icon><ChevronBackIcon /></n-icon>
-              </template>
-            </n-button>
-
-            <div class="pagination-dots">
-              <span
-                  v-for="(_, index) in quizChunks"
-                  :key="index"
-                  class="dot"
-                  :class="{ active: currentPage === index }"
-                  @click="goToPage(index)"
-              ></span>
-            </div>
-
-            <n-button
-                quaternary
-                circle
-                class="slider-arrow next"
-                @click="nextPage"
-                :disabled="currentPage >= quizChunks.length - 1"
-            >
-              <template #icon>
-                <n-icon><ChevronForwardIcon /></n-icon>
-              </template>
-            </n-button>
+      <div class="slider-container">
+        <!-- Pojedyncza strona quizów -->
+        <div class="cards-page" :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
+          <div class="quiz-card" v-for="(quiz, index) in activeChunk" :key="index">
+            <QuizCard :imageURL="quiz.image" :title="quiz.title" @start="startQuiz(quiz)" />
           </div>
         </div>
-      </n-tab-pane>
+      </div>
 
-      <n-tab-pane name="settings" tab="Ustawienia">
-        <div class="settings-panel">Ustawienia użytkownika (placeholder)</div>
-      </n-tab-pane>
-    </n-tabs>
+      <div class="slider-controls">
+        <n-button
+            quaternary
+            circle
+            class="slider-arrow prev"
+            @click="prevPage"
+            :disabled="currentPage === 0"
+        >
+          <template #icon>
+            <n-icon><ChevronBackIcon /></n-icon>
+          </template>
+        </n-button>
+
+        <div class="pagination-dots">
+          <span
+              v-for="(_, index) in quizChunks"
+              :key="index"
+              class="dot"
+              :class="{ active: currentPage === index }"
+              @click="goToPage(index)"
+          ></span>
+        </div>
+
+        <n-button
+            quaternary
+            circle
+            class="slider-arrow next"
+            @click="nextPage"
+            :disabled="currentPage >= quizChunks.length - 1"
+        >
+          <template #icon>
+            <n-icon><ChevronForwardIcon /></n-icon>
+          </template>
+        </n-button>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -85,17 +63,16 @@
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import {
-  NButton, NIcon, NCard, NTabs, NTabPane
+  NButton, NIcon
 } from 'naive-ui'
 import {
-  Heart as HeartOutline,
-  Play as PlayIcon,
   ChevronBack as ChevronBackIcon,
   ChevronForward as ChevronForwardIcon
 } from '@vicons/ionicons5'
 
+import QuizCard from '@/components/QuizCard.vue'
+
 const router = useRouter()
-const activeTab = ref('history')
 
 const quizzes = ref([
   { title: 'Star Wars', image: 'https://placehold.co/300x150/0000FF/FFFFFF?text=Star%20Wars' },
@@ -112,8 +89,9 @@ const quizzes = ref([
   { title: 'Music', image: 'https://placehold.co/300x150/00FFCC/000000?text=Music' }
 ])
 
+const itemsPerRow = ref(3)
+const itemsPerColumn = ref(2)   //3 x 2 = 6 quizów na stronę
 const currentPage = ref(0)
-const itemsPerPage = 6
 
 const chunkArray = (arr: any[], size: number) => {
   const chunked = []
@@ -123,7 +101,9 @@ const chunkArray = (arr: any[], size: number) => {
   return chunked
 }
 
-const quizChunks = computed(() => chunkArray(quizzes.value, itemsPerPage))
+const itemsPerPage = computed(() => itemsPerRow.value * itemsPerColumn.value)
+const quizChunks = computed(() => chunkArray(quizzes.value, itemsPerPage.value))
+const activeChunk = computed(() => quizChunks.value[currentPage.value] || [])
 
 const nextPage = () => {
   if (currentPage.value < quizChunks.value.length - 1) currentPage.value++
@@ -135,7 +115,6 @@ const goToPage = (index: number) => {
   currentPage.value = index
 }
 
-// Nawigacja
 const clearHistory = () => {
   router.push('/history-empty')
 }
@@ -158,14 +137,12 @@ const startQuiz = (quiz: { title: string; image: string }) => {
   padding: 20px;
 }
 
-.info-text {
+.page-title {
   color: white;
-  font-size: 14px;
-  margin-bottom: 16px;
-}
-
-.tabs {
-  background-color: transparent;
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .history-wrapper {
@@ -182,61 +159,27 @@ const startQuiz = (quiz: { title: string; image: string }) => {
   flex-wrap: wrap;
 }
 
-.quiz-cards {
-  display: flex;
-  transition: transform 0.5s ease;
-  width: 100%;
+.info-text {
+  color: white;
+  font-size: 14px;
+  margin-bottom: 16px;
 }
 
 .cards-page {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-  flex: 0 0 100%;
-  padding: 0 20px;
-  box-sizing: border-box;
+  --grid-min-col-size: 200px;
+  --grid-gap: 1rem;
+  --grid-col-size-calc: calc((100% - var(--grid-gap) * var(--itemsPerRow)) / var(--itemsPerRow));
+  --grid-col-min-size-calc: min(100%, max(var(--grid-min-col-size), var(--grid-col-size-calc)));
+
+  display: grid;
+  gap: var(--grid-gap);
+  grid-template-columns: repeat(auto-fit, minmax(var(--grid-col-min-size-calc), 1fr));
+  width: 100%;
 }
 
 .quiz-card {
-  width: 300px;
-  height: 150px;
-  background-color: #222;
-  border-radius: 8px;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-  border: 2px solid #004d1a;
-}
-
-.quiz-image {
-  width: 100%;
-  height: 100%;
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  position: relative;
-}
-
-.quiz-actions {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-}
-
-.quiz-title {
-  background: rgba(0, 0, 0, 0.7);
-  padding: 8px;
-  font-weight: bold;
-}
-
-.start-btn {
-  border-radius: 0 !important;
-  background-color: #004d1a !important;
-  display: flex;
-  justify-content: space-between !important;
+  height: 20vh;
+  width: 50vh;
 }
 
 .slider-controls {
@@ -273,42 +216,5 @@ const startQuiz = (quiz: { title: string; image: string }) => {
 .dot.active {
   background-color: #00cc66;
   transform: scale(1.2);
-}
-
-.settings-panel {
-  background-color: #444;
-  padding: 20px;
-  border-radius: 8px;
-  color: white;
-  text-align: center;
-}
-
-/* Zakładki */
-:deep(.custom-tabs .n-tabs-tab) {
-  background-color: #555;
-  color: white;
-  border-radius: 6px;
-  padding: 6px 16px;
-  transition: all 0.3s ease;
-}
-
-:deep(.custom-tabs .n-tabs-tab--active) {
-  background-color: #00cc66 !important;
-  color: white;
-}
-
-:deep(.n-tabs-segment),
-:deep(.n-tabs-wrapper),
-:deep(.n-tabs-nav-scroll-content),
-:deep(.n-tabs-segment-type) {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-:deep(.hamburger-btn),
-:deep(.menu-toggle),
-:deep(.drawer-trigger) {
-  display: none !important;
 }
 </style>
