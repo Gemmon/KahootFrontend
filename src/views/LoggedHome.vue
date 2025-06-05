@@ -277,7 +277,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
+import axios from 'axios';
 import { 
   NCard, 
   NButton, 
@@ -328,46 +329,34 @@ const yourSortOptions = [
   { label: 'Ocena', value: 'rating' }           // średnia z tabeli Ratings gdzie quiz_id = id quizu
 ];
 
-// Quiz data - static for testing
-const likedQuizzes = ref([
-  { title: 'Star Wars', image: 'https://placehold.co/300x150/0000FF/FFFFFF?text=Star%20Wars' },
-  { title: 'Marvel', image: 'https://placehold.co/300x150/FF0000/FFFFFF?text=Marvel' },
-  { title: 'DC Comics', image: 'https://placehold.co/300x150/00FF00/FFFFFF?text=DC%20Comics' },
-  { title: 'Harry Potter', image: 'https://placehold.co/300x150/FFFF00/000000?text=Harry%20Potter' },
-  { title: 'Lord of the Rings', image: 'https://placehold.co/300x150/FF00FF/FFFFFF?text=LOTR' },
-  { title: 'Game of Thrones', image: 'https://placehold.co/300x150/00FFFF/000000?text=GoT' },
-  { title: 'Breaking Bad', image: 'https://placehold.co/300x150/FFFFFF/000000?text=Breaking%20Bad' },
-  { title: 'Stranger Things', image: 'https://placehold.co/300x150/888888/FFFFFF?text=Stranger%20Things' },
-  { title: 'The Office', image: 'https://placehold.co/300x150/123456/FFFFFF?text=The%20Office' },
-  { title: 'Star Wars', image: 'https://placehold.co/300x150/0000FF/FFFFFF?text=Star%20Wars' },
-  { title: 'Marvel', image: 'https://placehold.co/300x150/FF0000/FFFFFF?text=Marvel' },
-  { title: 'DC Comics', image: 'https://placehold.co/300x150/00FF00/FFFFFF?text=DC%20Comics' },
-  { title: 'Harry Potter', image: 'https://placehold.co/300x150/FFFF00/000000?text=Harry%20Potter' },
-  { title: 'Lord of the Rings', image: 'https://placehold.co/300x150/FF00FF/FFFFFF?text=LOTR' },
-  { title: 'Game of Thrones', image: 'https://placehold.co/300x150/00FFFF/000000?text=GoT' },
-  { title: 'Breaking Bad', image: 'https://placehold.co/300x150/FFFFFF/000000?text=Breaking%20Bad' },
-  { title: 'Stranger Things', image: 'https://placehold.co/300x150/888888/FFFFFF?text=Stranger%20Things' },
-  { title: 'The Office', image: 'https://placehold.co/300x150/123456/FFFFFF?text=The%20Office' },
-]);
+const likedQuizzes = ref([]);
+const suggestedQuizzes = ref([]);
+const yourQuizzes = ref([]);
 
-const suggestedQuizzes = ref([
-  { title: 'Geography', image: 'https://placehold.co/300x150/0000FF/FFFFFF?text=Geography' },
-  { title: 'Science', image: 'https://placehold.co/300x150/FF0000/FFFFFF?text=Science' },
-  { title: 'History', image: 'https://placehold.co/300x150/00FF00/FFFFFF?text=History' },
-  { title: 'Literature', image: 'https://placehold.co/300x150/FFFF00/000000?text=Literature' },
-  { title: 'Music', image: 'https://placehold.co/300x150/FF00FF/FFFFFF?text=Music' },
-  { title: 'Movies', image: 'https://placehold.co/300x150/00FFFF/000000?text=Movies' },
-  { title: 'Sports', image: 'https://placehold.co/300x150/FFFFFF/000000?text=Sports' }
-]);
+//const authStore = useAuthStore() authStore.token ||
+const token =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsImVtYWlsIjoibWljaGFsQGdtYWlsLmNvbSIsImlhdCI6MTc0OTEzMzA1OH0.fACyGl1pVlIdz3HMSU8JBm3ys2sJ0HH2Amt4faW19eA"
 
-const yourQuizzes = ref([
-  { title: 'JavaScript', image: 'https://placehold.co/300x150/F7DF1E/000000?text=JavaScript' },
-  { title: 'Python', image: 'https://placehold.co/300x150/3776AB/FFFFFF?text=Python' },
-  { title: 'Vue.js', image: 'https://placehold.co/300x150/4FC08D/FFFFFF?text=Vue.js' },
-  { title: 'React', image: 'https://placehold.co/300x150/61DAFB/000000?text=React' },
-  { title: 'Angular', image: 'https://placehold.co/300x150/DD0031/FFFFFF?text=Angular' },
-  { title: 'Node.js', image: 'https://placehold.co/300x150/339933/FFFFFF?text=Node.js' }
-]);
+const headers = {
+  Authorization: `Bearer ${token}`
+}
+
+const fetchQuizzes = async () => {
+  try {
+    const [likedRes, suggestedRes, yourRes] = await Promise.all([
+      axios.get("http://localhost:3000/quizes/liked", { headers }),
+      axios.get("http://localhost:3000/quizes/suggested?limit=10&offset=0", { headers }),
+      axios.get("http://localhost:3000/quizes", { headers }),
+    ]);
+
+    likedQuizzes.value = likedRes.data;
+    suggestedQuizzes.value = suggestedRes.data.data;
+    yourQuizzes.value = yourRes.data.data;
+
+  } catch (err) {
+    console.error("Błąd podczas pobierania quizów:", err);
+  }
+};
+
 
 
 const goToQuiz = (id: number): void => {
@@ -420,10 +409,15 @@ const goToPage = (section: any, pageIndex: number) => {
   }
 };
 
-// Modal methods
 const toggleJoinModal = () => {
   showJoinModal.value = !showJoinModal.value;
 };
+
+// Pobranie wszystkich potrzebnych danych przy wczytaniu strony
+onMounted(() => {
+  fetchQuizzes();
+});
+
 </script>
 
 <style scoped>
