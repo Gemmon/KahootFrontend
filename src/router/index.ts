@@ -47,7 +47,7 @@ const router = createRouter({
       path: '/restore-password',
       name: 'restore-password',
       component: () => import('../views/RestorePasswordPageView.vue')
-    },
+    }
 
   ],
 })
