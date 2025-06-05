@@ -24,6 +24,31 @@ const router = createRouter({
       component: () => import('../views/LobbyHostView.vue')
     },
     {
+      path: '/lobby-guest',
+      name: 'lobby-guest',
+      component: () => import('../views/LobbyGuestView.vue')
+    },
+    {
+      path: '/login',
+      name: 'login',
+      component: () => import('../views/LogInPageView.vue')
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: () => import('../views/SignUpPageView.vue')
+    },
+    {
+      path: '/forgot-password',
+      name: 'forgot-password',
+      component: () => import('../views/ForgotPasswordPageView.vue')
+    },
+    {
+      path: '/restore-password',
+      name: 'restore-password',
+      component: () => import('../views/RestorePasswordPageView.vue')
+    },
+    {
       path: '/individual',
       name: 'individual',
       component: () => import('../views/InvidualQuiz.vue')

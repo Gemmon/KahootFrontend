@@ -1,22 +1,22 @@
-
 <template>
-    <n-dropdown trigger="click" :options="isLogged ? dropdownOptionsLogged : dropdownOptionsLoggedOut" @select="handleSelect">
-        <div class="user-profile">
-            <n-avatar round src="https://placehold.co/40" />
-        </div>
-    </n-dropdown>
+  <n-dropdown trigger="click" :options="isLogged ? dropdownOptionsLogged : dropdownOptionsLoggedOut"
+    @select="handleSelect">
+    <div class="user-profile">
+      <n-avatar round src="https://placehold.co/40" />
+    </div>
+  </n-dropdown>
 </template>
 
-<script setup lang="ts" >
+<script setup lang="ts">
 
 import { ref } from 'vue'
-import { 
-  NAvatar, 
-  NDropdown, 
+import {
+  NAvatar,
+  NDropdown,
 } from 'naive-ui'
+
 import { useRouter } from 'vue-router'
 const router = useRouter()
-
 
 const props = defineProps<{
   isLogged: Boolean
@@ -54,18 +54,23 @@ const dropdownOptionsLoggedOut = [
   }
 ]
 
+const goToLogin = () => {
+  router.push('/login')
+}
+  const handleSelect = (key: string) => {
+    console.log(`Selected: ${key}`)
 
-const handleSelect = (key: string) => {
-  console.log(`Selected: ${key}`)
-
-  if (key === 'history') {
-    if (userHasQuizHistory.value) {
-      router.push('/history')
-    } else {
-      router.push('/history-empty')
+    if (key === 'history') {
+      if (userHasQuizHistory.value) {
+        router.push('/history')
+      } else {
+        router.push('/history-empty')
+      }
+    }
+    if (String(key) == 'login') {
+      goToLogin()
     }
   }
-}
 
 </script>
 
@@ -73,5 +78,4 @@ const handleSelect = (key: string) => {
 .user-profile {
   cursor: pointer;
 }
-
 </style>

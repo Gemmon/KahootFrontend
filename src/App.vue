@@ -20,7 +20,7 @@ const isLogged = ref(true)
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 60px);
-  height: 100%;
+  background-color: #333;;
 }
 
 </style>

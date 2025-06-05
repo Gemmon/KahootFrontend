@@ -98,9 +98,16 @@ const goToExplore = () =>{
   router.push('/explore')
 }
 
+const goToLogin = () =>{
+
+router.push('/login')
+}
+
+
 const goToCreateQuiz = () => {
   router.push('/create-quiz')
 }
+
 </script>
 
 <style scoped>
