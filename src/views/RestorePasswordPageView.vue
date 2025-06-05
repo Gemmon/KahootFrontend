@@ -59,7 +59,7 @@ const passwordRules = ref({
   repeatPassword: [
     { required: true, message: 'Powtórz hasło.', trigger: 'blur' },
     {
-      validator: (_, value) => {
+      validator: (_ :any, value:any) => {
         if (value !== passwordFormValue.value.newPassword) {
           return new Error('Hasła się różnią.')
         }

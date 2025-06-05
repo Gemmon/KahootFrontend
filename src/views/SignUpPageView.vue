@@ -51,7 +51,7 @@ const formValue = ref({
 const formRules = ref({
     email: [
         { required: true, message: 'Email jest wymagany.', trigger: 'blur' },
-        { type: 'email', message: 'Nieprawidłowy format email.', trigger: 'blur' }
+        { type: 'email' as const, message: 'Nieprawidłowy format email.', trigger: 'blur' }
     ],
     username: [
         { required: true, message: 'Nazwa użytkownika jest wymagana.', trigger: 'blur' },
