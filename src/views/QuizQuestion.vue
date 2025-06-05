@@ -22,12 +22,18 @@
             </div>
             <div class="image-column">
               <div class="right-image-container">
-                <img :src="rightImage" alt="" class="right-image" />
+                <AnswerDistribution
+                  v-if="showResult"
+                  :answers="answers"
+                  :votes="mockVotes"
+                  :correctAnswerId="correctAnswerId"
+                  :selectedAnswerId="selectedAnswerId"
+                />
+                <img v-else :src="rightImage" alt="" class="right-image" />
               </div>
             </div>
           </div>
         </div>
-
         <TimerBar 
           :timeRemaining="timeRemaining" 
           :timeLimit="TIME_LIMIT" 
@@ -42,13 +48,14 @@
 <script setup lang="ts">
 import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
 import QuestionCard from '../components/QuestionCard.vue';
+import AnswerDistribution from '../components/AnswerDistribution.vue';
 import TimerBar from '../components/TimerBar.vue';
 
 const selectedAnswerId = ref<string | null>(null);
 const correctAnswerId = 'C'; // na razie na sztywno, potem z backu
 const showResult = ref(false);
 
-const TIME_LIMIT = 15;
+const TIME_LIMIT = 15; // Możecie zmniejszyć jak cierpliwość małą
 
 defineProps<{
   title: string;
@@ -93,6 +100,13 @@ const {
 } = mockProps;
 
 let timerId: number | undefined;
+
+const mockVotes = {
+  A: 5,
+  B: 2,
+  C: 9,
+  D: 0,
+};
 
 onMounted(() => {
   timerId = setInterval(() => {
