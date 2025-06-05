@@ -57,6 +57,10 @@ const dropdownOptionsLoggedOut = [
 const goToLogin = () => {
   router.push('/login')
 }
+const goToSettings = () => {
+  router.push('/profile')
+}
+
   const handleSelect = (key: string) => {
     console.log(`Selected: ${key}`)
 
@@ -69,6 +73,9 @@ const goToLogin = () => {
     }
     if (String(key) == 'login') {
       goToLogin()
+    }
+    if (String(key) == 'settings') {
+      goToSettings()
     }
   }
 
