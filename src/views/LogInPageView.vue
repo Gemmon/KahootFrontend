@@ -5,9 +5,9 @@
           ref="formRef"
           :model="formValue"
       >
-        <n-form-item label="Username" path="username">
+        <n-form-item label="Email" path="email">
           <n-input 
-          v-model:value="formValue.username"
+          v-model:value="formValue.email"
           placeholder="" 
           clearable 
           />
@@ -42,18 +42,37 @@
 import { ref } from 'vue'
 import { NForm,NFormItem,NInput,NButton } from 'naive-ui';
 import { useRouter } from 'vue-router';
+import axios from 'axios'
+import { useAuthStore } from '@/stores/auth'
+
 const formValue = ref(
   { 
-    username: '',
+    email: '',
     password: '' 
   })
   const router = useRouter()
+  const authStore = useAuthStore()
   const handleForgotPasswordClick = () =>{
     router.push('/forgot-password')
   }
-  const handleEnterClick = () =>{
-    alert(formValue.value.username + ", " + formValue.value.password)
+
+  const handleEnterClick = async () => {
+    try {
+      const response = await axios.post('/login', {
+        email: formValue.value.email,
+        password: formValue.value.password
+      })
+
+      const token = response.data.token
+      authStore.setToken(token)
+
+      router.push('/')
+    } catch (error: any) {
+      console.error('Błąd logowania:', error)
+      alert(error.response?.data?.message || 'Nie udało się zalogować.')
+    }
   }
+
   const handleSignUpClick = () =>{
     router.push('/signup')
   }
