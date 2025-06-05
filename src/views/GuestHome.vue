@@ -39,7 +39,7 @@
             <div class="cards-page" :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
               <div class="quiz-card" v-for="(quiz, index) in activeChunk"
                 :key="'quiz-' + CurrentPage + '-' + index">
-                <QuizCard :imageURL="quiz.image" :title="quiz.title" />
+                <QuizCard :imageURL="quiz.image" :title="quiz.title" @click="goToQuiz(quiz.id)"/>
               </div>
             </div>
           </div>
@@ -96,6 +96,12 @@ import {
 import { ChevronBack as ChevronBackIcon, ChevronForward as ChevronForwardIcon } from '@vicons/ionicons5';
 
 import QuizCard from '@/components/QuizCard.vue';
+import { useRouter } from 'vue-router';
+const router = useRouter();
+
+const goToCreateLobby = (quiz: any) => {
+  router.push({ name: 'create-lobby', query: { title: quiz.title, image: quiz.image } });
+}
 
 const joinCode = ref('')
 const errorMessage = ref('')
@@ -154,9 +160,12 @@ const Quizzes = ref([
   
 ]);
 
+const goToQuiz = (id: number): void => {
+  router.push({ name: 'individual', query: { mine: "true"} });
+};
 
 // Helper function to chunk an array into smaller arrays
-const chunkArray = (array, size: number) => {
+const chunkArray = (array: any, size: number) => {
   const chunked = [];
   for (let i = 0; i < array.length; i += size) {
     chunked.push(array.slice(i, i + size));

@@ -9,8 +9,8 @@
       </n-button>
     </div>
     <div class="quiz-title">{{ title }}</div>
-    <n-button class="start-btn" block type="primary">
-      Start 
+    <n-button class="start-btn" block type="primary" @click="$emit('start')">
+      Start
       <template #icon>
         <n-icon><PlayIcon /></n-icon>
       </template>
@@ -22,6 +22,8 @@
 import { NButton, NIcon } from 'naive-ui';
 import { HeartFilled } from '@vicons/antd'
 import { Play as PlayIcon } from '@vicons/ionicons5'
+
+defineEmits(['start'])
 
 const props = defineProps<{
     imageURL: string

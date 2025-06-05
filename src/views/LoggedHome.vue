@@ -42,7 +42,7 @@
                     class="cards-page" 
                     :class="{ 'active-page': likedCurrentPage === chunkIndex }"
                   >
-                    <div class="quiz-card" v-for="(quiz, index) in chunk" :key="'liked-'+chunkIndex+'-'+index">
+                    <div class="quiz-card" v-for="(quiz, index) in chunk" :key="'liked-'+chunkIndex+'-'+index" >
                       <div class="quiz-image" :style="{ backgroundImage: `url(${quiz.image})` }">
                         <div class="quiz-actions">
                           <n-button quaternary circle>
@@ -52,7 +52,7 @@
                           </n-button>
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
-                        <n-button class="start-btn" block type="primary">
+                        <n-button class="start-btn" block type="primary" @click="goToQuiz(index)">
                           Start 
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
@@ -296,7 +296,7 @@ import {
   ChevronForward as ChevronForwardIcon
 } from '@vicons/ionicons5';
 import { HeartFilled } from '@vicons/antd';
-
+import router from '@/router';
 // Reactive state
 const showJoinModal = ref(false);
 const likedSort = ref('Najnowsze');
@@ -370,8 +370,13 @@ const yourQuizzes = ref([
 ]);
 
 
+const goToQuiz = (id: number): void => {
+  console.log("KLIK KLIK");
+  router.push({ name: 'individual', query: { mine: "true"} });
+};
+
 // Helper function to chunk an array into smaller arrays
-const chunkArray = (array, size) => {
+const chunkArray = (array: any[], size: number) => {
   const chunked = [];
   for (let i = 0; i < array.length; i += size) {
     chunked.push(array.slice(i, i + size));
@@ -385,7 +390,7 @@ const suggestedQuizChunks = computed(() => chunkArray(suggestedQuizzes.value, it
 const yourQuizChunks = computed(() => chunkArray(yourQuizzes.value, itemsPerPage));
 
 // Navigation methods
-const nextPage = (section) => {
+const nextPage = (section: any) => {
   if (section === 'liked' && likedCurrentPage.value < likedQuizChunks.value.length - 1) {
     likedCurrentPage.value++;
   } else if (section === 'suggested' && suggestedCurrentPage.value < suggestedQuizChunks.value.length - 1) {
@@ -395,7 +400,7 @@ const nextPage = (section) => {
   }
 };
 
-const prevPage = (section) => {
+const prevPage = (section: any) => {
   if (section === 'liked' && likedCurrentPage.value > 0) {
     likedCurrentPage.value--;
   } else if (section === 'suggested' && suggestedCurrentPage.value > 0) {
@@ -405,7 +410,7 @@ const prevPage = (section) => {
   }
 };
 
-const goToPage = (section, pageIndex) => {
+const goToPage = (section: any, pageIndex: number) => {
   if (section === 'liked') {
     likedCurrentPage.value = pageIndex;
   } else if (section === 'suggested') {
