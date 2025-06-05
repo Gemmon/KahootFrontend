@@ -5,14 +5,12 @@
         <span class="logo-letter">G</span>
       </div>
       <nav class="main-nav" v-if="props.isLogged">
-        <RouterLink to="/create-lobby">
-          <n-button class="nav-btn" quaternary type="primary">
-            <template #icon>
-              <n-icon><AddIcon /></n-icon>
-            </template>
-            Create
-          </n-button>
-        </RouterLink>
+        <n-button class="nav-btn" quaternary type="primary" @click="goToCreateQuiz">
+          <template #icon>
+            <n-icon><AddIcon /></n-icon>
+          </template>
+          Create
+        </n-button>
         <!-- Join Button with custom dropdown -->
         <n-popover 
           trigger="click" 
@@ -47,7 +45,7 @@
       </nav>
     </div>
     <div class="header-right">
-      <Avatar v-bind:isLogged="isLogged" />
+      <Avatar  v-bind:isLogged="isLogged" />
     </div>
   </n-layout-header>
 </template>
@@ -99,6 +97,7 @@ const goToExplore = () =>{
 
   router.push('/explore')
 }
+
 const goToLogin = () =>{
 
 router.push('/login')
@@ -107,6 +106,11 @@ router.push('/login')
 
 // router.push('/explore')
 // }
+goToCreate
+const Quiz = () => {
+  router.push('/create-quiz')
+}
+
 </script>
 
 <style scoped>
@@ -133,15 +137,15 @@ router.push('/login')
   justify-content: center;
   background-color: white;
   border-radius: 50%;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   margin-right: 15px;
 }
 
 .logo-letter {
   color: #004d1a;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .main-nav {
@@ -151,7 +155,7 @@ router.push('/login')
 
 .nav-btn {
   color: white !important;
-  font-size: 16px;
+  font-size: 18px;
 }
 
 :deep(.n-dropdown-menu) {
@@ -221,4 +225,5 @@ router.push('/login')
   align-self: center;
   font-weight: bold;
 }
+
 </style>

@@ -57,8 +57,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
-import { NScrollbar, NButton, NIcon } from 'naive-ui';
+import { computed, ref } from 'vue'
+import { NScrollbar, NButton, NIcon } from 'naive-ui'
 import { InformationCircleOutline } from '@vicons/ionicons5'
 
 // link to the avatar image used in Figma mockup
