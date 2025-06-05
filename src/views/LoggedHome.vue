@@ -277,7 +277,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import axios from 'axios';
 import { 
   NCard, 
@@ -333,30 +333,72 @@ const likedQuizzes = ref([]);
 const suggestedQuizzes = ref([]);
 const yourQuizzes = ref([]);
 
-//const authStore = useAuthStore() authStore.token ||
+// Testowy token wygenerowany z pomocą Postmana
 const token =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsImVtYWlsIjoibWljaGFsQGdtYWlsLmNvbSIsImlhdCI6MTc0OTEzMzA1OH0.fACyGl1pVlIdz3HMSU8JBm3ys2sJ0HH2Amt4faW19eA"
 
 const headers = {
   Authorization: `Bearer ${token}`
 }
 
-const fetchQuizzes = async () => {
+const fetchLikedQuizzes = async () => {
   try {
-    const [likedRes, suggestedRes, yourRes] = await Promise.all([
-      axios.get("http://localhost:3000/quizes/liked", { headers }),
-      axios.get("http://localhost:3000/quizes/suggested?limit=10&offset=0", { headers }),
-      axios.get("http://localhost:3000/quizes", { headers }),
-    ]);
-
-    likedQuizzes.value = likedRes.data;
-    suggestedQuizzes.value = suggestedRes.data.data;
-    yourQuizzes.value = yourRes.data.data;
-
+    const res = await axios.get(
+      `/quizes/liked?sort_by=${likedSort.value}`,
+      { headers }
+    );
+    likedQuizzes.value = res.data;
+    likedCurrentPage.value = 0;
   } catch (err) {
-    console.error("Błąd podczas pobierania quizów:", err);
+    console.error("Błąd podczas pobierania polubionych quizów:", err);
   }
 };
 
+const fetchSuggestedQuizzes = async () => {
+  try {
+    const limit = 12;
+    const offset = 0;
+
+    const res = await axios.get(
+      `/quizes/suggested?sort_by=${suggestedSort.value}&limit=${limit}&offset=${offset}`,
+      { headers }
+    );
+    suggestedQuizzes.value = res.data.data;
+    suggestedCurrentPage.value = 0;
+  } catch (err) {
+    console.error("Błąd podczas pobierania sugerowanych quizów:", err);
+  }
+};
+
+const fetchYourQuizzes = async () => {
+  try {
+    const limit = 12;
+    const offset = 0;
+
+    const res = await axios.get(
+      `/quizes?limit=${limit}&offset=${offset}`,
+      { headers }
+    );
+
+    yourQuizzes.value = res.data.data;
+    yourCurrentPage.value = 0;
+  } catch (err) {
+    console.error("Błąd podczas pobierania Twoich quizów:", err);
+  }
+};
+
+
+// Sprawdzanie czy sortowanie zostało zmienione 
+watch(likedSort, () => {
+  fetchLikedQuizzes();
+});
+
+watch(suggestedSort, () => {
+  fetchSuggestedQuizzes();
+});
+
+watch(yourSort, () => {
+  fetchYourQuizzes();
+});
 
 
 const goToQuiz = (id: number): void => {
@@ -415,7 +457,9 @@ const toggleJoinModal = () => {
 
 // Pobranie wszystkich potrzebnych danych przy wczytaniu strony
 onMounted(() => {
-  fetchQuizzes();
+  fetchLikedQuizzes();
+  fetchSuggestedQuizzes();
+  fetchYourQuizzes();
 });
 
 </script>
