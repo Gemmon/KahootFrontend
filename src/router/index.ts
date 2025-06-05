@@ -6,7 +6,7 @@ const router = createRouter({
     {
       path: '/',
       name: 'home',
-      component: () => import('@/views/QuizHistoryView.vue'),
+      component: () => import('@/views/MainPage.vue'),
     },
     {
       path: '/explore',
@@ -42,6 +42,26 @@ const router = createRouter({
       path: '/history-empty',
       name: 'history-empty',
       component: () => import('../views/QuizHistoryViewEmpty.vue'),
+    },
+    {
+      path: '/history',
+      name: 'history',
+      component: () => import('../views/QuizHistoryView.vue'),
+    },
+    {
+      path: '/current-ranking',
+      name: 'current-ranking',
+      component: () => import('../views/CurrentRanking.vue'),
+    },
+    {
+      path: '/final-ranking-host',
+      name: 'final-ranking-host',
+      component: () => import('../views/FinalRankingHost.vue'),
+    },
+    {
+      path: '/final-ranking-guest',
+      name: 'final-ranking-guest',
+      component: () => import('../views/FinalRankingGuest.vue'),
     },
   ],
 })
