@@ -102,12 +102,9 @@ const goToLogin = () =>{
 
 router.push('/login')
 }
-// const goToExplore = () =>{
 
-// router.push('/explore')
-// }
-goToCreate
-const Quiz = () => {
+
+const goToCreateQuiz = () => {
   router.push('/create-quiz')
 }
 
