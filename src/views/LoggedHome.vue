@@ -53,7 +53,7 @@
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
                         <n-button class="start-btn" block type="primary" @click="goToQuiz(index)">
-                          Start 
+                          Start
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
                           </template>
@@ -134,7 +134,7 @@
                           </n-button>
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
-                        <n-button class="start-btn" block type="primary">
+                        <n-button class="start-btn" block type="primary" @click="goToQuiz(index)">
                           Start 
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
@@ -214,7 +214,7 @@
                           </n-button>
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
-                        <n-button class="start-btn" block type="primary">
+                        <n-button class="start-btn" block type="primary" @click="goToQuiz(index)">
                           Start 
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
@@ -393,8 +393,7 @@ watch(yourSort, () => {
 
 
 const goToQuiz = (id: number): void => {
-  console.log("KLIK KLIK");
-  router.push({ name: 'individual', query: { mine: "true"} });
+  router.push({ name: 'individual', query: { mine: "true", quizId: id} });
 };
 
 // Helper function to chunk an array into smaller arrays

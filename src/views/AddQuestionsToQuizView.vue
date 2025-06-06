@@ -397,21 +397,23 @@ const validateQuiz = () => {
   return true;
 };
 
+// Do dodania nowego quizu
 const publishQuiz = () => {
   if (!validateQuiz()) return;
   
-  // Here send the data to backend
+  
+  // Dodać wysyłanie gdy będzie endpoint z pytaniami
   console.log('Publishing quiz:', quizData);
   alert('Quiz został opublikowany!');
+  router.push("/");
 };
 
+// Do edytowania istniejąceo quizu
 const saveChanges = () => {
   if (!validateQuiz()) return;
   
-  // Here update the existing quiz in backend
   console.log('Saving changes to quiz:', quizData);
   alert('Zmiany zostały zapisane!');
-  // Wracanie do strony quizu
   router.back();
 };
 
