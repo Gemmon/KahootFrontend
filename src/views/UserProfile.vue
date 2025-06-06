@@ -7,77 +7,79 @@
                     <span> Nazwa użytkownika</span>
                 </div>
                 <div class="prof-user-stats-main f-child">
-                    <n-card title="Statystyki użytkownika">
-                        <div class="prof-user-stats-content">
+                    <n-card title="Statystyki użytkownika" class="prof-user-stats-content">
                             <div class="stats-blocks">
-                                <div id="games-played" class="stat">
-                                    <n-card title="Liczba zagranych gier">{{ userStats?.gamesPlayed }}</n-card>
-                                </div>
-                                <div id="games-won" class="stat">
-                                    <n-card title="Liczba wygranych gier">{{ userStats?.gamesWon }}</n-card>
-                                </div>
-                                <div id="quizes-created" class="stat">
-                                    <n-card title="Liczba stworzonych gier">{{ userStats?.gamesMade }}</n-card>
-                                </div>
-                                <div id="avg-quizes-rate" class="stat">
-                                    <n-card title="Średnia oceń quizów">{{ userStats?.gamesPlayed }}</n-card>
-                                </div>
+                                    <n-card class="stat" title="Liczba zagranych gier">{{ userStats?.gamesPlayed }}</n-card>
+                                    <n-card class="stat" title="Liczba wygranych gier">{{ userStats?.gamesWon }}</n-card>
+                                    <n-card class="stat" title="Liczba stworzonych gier">{{ userStats?.gamesMade }}</n-card>
+                                    <n-card class="stat" title="Średnia oceń quizów">{{ userStats?.gamesPlayed }}</n-card>
                             </div>
                             <div class="quizes-created">
-                                <n-card class="quiz-section" content-style="padding: 0">
-                                    <div class="quiz-section-header">
-                                        <n-h3>Suggested Quizzes</n-h3>
-                                        <div class="sort-dropdown">
-                                            <span>Sort by</span>
-                                            <n-select v-model:value="suggestedSort" :options="suggestedSortOptions"
-                                                size="small" />
-                                        </div>
-                                    </div>
-
-                                    <div class="quiz-cards-container">
-                                        <transition :name="`fade-slide-${transitionDirection}`" mode="out-in">
-                                            <div :key="CurrentPage">
-                                                <div class="cards-page"
-                                                    :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
-                                                    <div class="quiz-card" v-for="(quiz, index) in activeChunk"
-                                                        :key="'quiz-' + CurrentPage + '-' + index">
-                                                        <QuizCard :imageURL="quiz.image" :title="quiz.title" />
-                                                    </div>
+                                <n-card title="Twoje Quizy" class="quiz-section">
+                                        <div class="toolbar-container">
+                                            <div id="search">
+                                                <n-input placeholder="Search..." v-model:value="SearchFor" size="small"
+                                                    :clearable="true" />
+                                            </div>
+                                            <div id="dropdown-options">
+                                                <div class="dropdown" id="sort">
+                                                    <span>Sort by:</span>
+                                                    <n-select v-model:value="SortBy" :options="SortOptions"
+                                                        size='' />
+                                                </div>
+                                                <div class="dropdown" id="filter">
+                                                    <span>Filter by:</span>
+                                                    <n-select v-model:value="FilterBy" :options="FilterOptions"
+                                                        size="small" />
                                                 </div>
                                             </div>
-                                        </transition>
-                                    </div>
-
-                                    <!-- Right arrow to scroll quizes -->
-                                    <div class="arrows-container">
-                                        <n-button quaternary circle class="slider-arrow prev" @click="prevPage()"
-                                            :disabled="CurrentPage === 0">
-                                            <template #icon>
-                                                <n-icon>
-                                                    <ChevronBackIcon />
-                                                </n-icon>
-                                            </template>
-                                        </n-button>
-
-                                        <!-- Pagination Dots on the bottom  -->
-                                        <div class="pagination-dots">
-                                            <span v-for="(_, index) in QuizChunks" :key="'dot--' + index" class="dot"
-                                                :class="{ 'active': CurrentPage === index }"
-                                                @click="goToPage(index)"></span>
                                         </div>
 
-                                        <n-button quaternary circle class="slider-arrow next" @click="nextPage()"
-                                            :disabled="CurrentPage >= QuizChunks.length - 1">
-                                            <template #icon>
-                                                <n-icon>
-                                                    <ChevronForwardIcon />
-                                                </n-icon>
-                                            </template>
-                                        </n-button>
-                                    </div>
+
+                                        <div class="quiz-cards-container">
+                                            <transition :name="`fade-slide-${transitionDirection}`" mode="out-in">
+                                                <div :key="yourQuizzesPage">
+                                                    <div class="cards-page"
+                                                        :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
+                                                        <div class="quiz-card f-child"
+                                                            v-for="(quiz, index) in activeChunk"
+                                                            :key="'quiz-' + yourQuizzesPage + '-' + index">
+                                                            <QuizCard :imageURL="quiz.image" :title="quiz.title" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </transition>
+                                        </div>
+
+                                        <!-- Right arrow to scroll quizes -->
+                                        <div class="arrows-container">
+                                            <n-button quaternary circle class="slider-arrow prev" @click="prevPage()"
+                                                :disabled="yourQuizzesPage === 0">
+                                                <template #icon>
+                                                    <n-icon>
+                                                        <ChevronBackIcon />
+                                                    </n-icon>
+                                                </template>
+                                            </n-button>
+
+                                            <!-- Pagination Dots on the bottom  -->
+                                            <div class="pagination-dots">
+                                                <span v-for="(_, index) in yourQuizChunks" :key="'dot--' + index"
+                                                    class="dot" :class="{ 'active': yourQuizzesPage === index }"
+                                                    @click="goToPage(index)"></span>
+                                            </div>
+
+                                            <n-button quaternary circle class="slider-arrow next" @click="nextPage()"
+                                                :disabled="yourQuizzesPage >= yourQuizChunks.length - 1">
+                                                <template #icon>
+                                                    <n-icon>
+                                                        <ChevronForwardIcon />
+                                                    </n-icon>
+                                                </template>
+                                            </n-button>
+                                        </div>
                                 </n-card>
                             </div>
-                        </div>
                     </n-card>
                 </div>
             </div>
@@ -88,7 +90,7 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { NCard, NAvatar } from 'naive-ui';
+import { NCard, NAvatar, NIcon, NButton, NSelect, NInput } from 'naive-ui';
 import QuizCard from '@/components/QuizCard.vue'
 import {
     ChevronBack as ChevronBackIcon,
@@ -102,11 +104,14 @@ interface Stats {
     avgQuizRate: number
 }
 const userStats = ref<Stats | null>(null)
-const yourQuizzesPage = ref(0);
 const suggestedSort = ref('Najnowsze');
-const suggestedCurrentPage = ref(0);
-const yourQuizChunks = computed(() => chunkArray(yourQuizzes, itemsPerPage));
-const itemsPerPage = 4;
+const yourQuizzesPage = ref(0);
+const yourQuizChunks = computed(() => chunkArray(yourQuizzes, (itemsPerRow.value * itemsPerColumn.value)));
+const activeChunk = computed(() => yourQuizChunks.value[yourQuizzesPage.value]);
+const itemsPerRow = ref(3);
+const itemsPerColumn = ref(1);
+const transitionDirection = ref<'left' | 'right'>('left');
+
 const suggestedSortOptions = [
     { label: 'Najnowsze', value: 'created_at' }, // na podstawie created_at z tabeli Quizzes
     { label: 'Alfabetycznie', value: 'title' },  // na podstawie title z tabeli Quizzes
@@ -132,26 +137,37 @@ const chunkArray = (array: any[], size: number) => {
     return chunked;
 };
 
-const goToPage = (pageIndex: number) => {
-        suggestedCurrentPage.value = pageIndex;
+// Navigation methods
+const nextPage = () => {
+    if (yourQuizzesPage.value < yourQuizChunks.value.length - 1) {
+        transitionDirection.value = 'left';
+        yourQuizzesPage.value++;
+    }
 };
 
 const prevPage = () => {
-    if (suggestedCurrentPage.value > 0) {
-        suggestedCurrentPage.value--;
+    if (yourQuizzesPage.value > 0) {
+        transitionDirection.value = 'right';
+        yourQuizzesPage.value--;
     }
 };
 
-const nextPage = () => {
-    if (suggestedCurrentPage.value < yourQuizChunks.value.length - 1) {
-        suggestedCurrentPage.value++;
-    }
+const goToPage = (pageIndex: number) => {
+    if (yourQuizzesPage.value > pageIndex)
+        transitionDirection.value = 'right';
+    else
+        transitionDirection.value = 'left';
+
+    yourQuizzesPage.value = pageIndex;
 };
 </script>
 
 
 
 <style scoped>
+:deep(*){
+    color: white !important;
+}
 .main {
     background-color: #333;
     color: white;
@@ -162,9 +178,14 @@ const nextPage = () => {
 }
 
 .profile-container {
+    background-color: #444;
     max-width: 1200px;
     width: 100%;
     margin: 1rem auto;
+    height: fit-content;
+}
+:deep(.profile-container > .n-card-header){
+    --n-padding-left: 1rem;
 }
 
 .content {
@@ -179,75 +200,62 @@ const nextPage = () => {
     align-items: center;
     gap: 1rem;
     padding: 2rem;
-    background-color: #444;
+    background-color: #00891D;
     border-radius: 8px;
 }
 
 .prof-user-stats-main {
     background-color: transparent;
 }
+:deep(.prof-user-stats-content > .n-card-header){
+    --n-padding-left: 0;
+}
 
 .stats-blocks {
     display: flex;
     gap: 0.5rem;
-    padding: 0.5rem;
+    padding: 0.5rem 0 ;
     width: 100%;
     flex-wrap: wrap;
+    justify-content: space-between;
+    box-sizing: border-box;
 }
 
 .stat {
     flex: 1;
-    min-width: 250px;
+    background-color: #322E38;
+        border-radius: 10px;
+        text-align: center;
 }
 
 .f-child {
     flex: 1;
 }
 
-/* Quiz Slider */
-.quiz-section {
-    margin-top: 1rem;
-    background-color: #444 !important;
-    position: relative;
+.cards-page {
+    display: flex;
+    gap: 1rem;
 }
 
-.quiz-section-header {
+.arrows-container {
+    padding-top: 1rem;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    background-color: #444;
-    padding: 10px 15px;
-    border-radius: 4px;
+    gap: 20px;
+    margin: 0.5rem 0;
 }
 
-.sort-dropdown {
+.pagination-dots {
     display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.quiz-slider {
-    position: relative;
-    padding: 10px 0 30px;
-}
-
-.quiz-cards-container {
-    overflow: hidden;
-    width: 100%;
-}
-
-.quiz-cards {
-    display: flex;
-    transition: transform 0.5s ease;
-    width: 100%;
-    gap: 15px;
-    padding: 0 40px;
+    justify-content: center;
+    gap: 8px;
+    bottom: 5px;
+    left: 0;
+    right: 0;
 }
 
 .slider-arrow {
-    position: absolute !important;
-    top: 50%;
-    transform: translateY(-50%);
     z-index: 10;
     background-color: rgba(0, 0, 0, 0.5) !important;
     color: white !important;
@@ -264,61 +272,105 @@ const nextPage = () => {
     right: 5px;
 }
 
-.slider-arrow:disabled {
-    opacity: 0.5;
-    cursor: default;
+.quiz-card {
+    height: 20vh;
 }
-
-.pagination-dots {
+.toolbar-container {
     display: flex;
-    justify-content: center;
-    gap: 8px;
-    position: absolute;
-    bottom: 5px;
-    left: 0;
-    right: 0;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap:1rem;
+    margin-bottom: 1rem ;
+    padding: 0 0.5rem;
+}
+:deep(.n-select) {
+  width: 20ch;
 }
 
+:deep(.n-card__content){
+    --n-padding-top: 0;
+    --n-padding-bottom: 0;
+    --n-padding-left: 0;
+}
+
+/* Slide left (next) */
+.fade-slide-left-enter-active,
+.fade-slide-left-leave-active {
+    transition: all 0.4s ease;
+}
+
+.fade-slide-left-enter-from {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+.fade-slide-left-leave-to {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+/* Slide right (prev) */
+.fade-slide-right-enter-active,
+.fade-slide-right-leave-active {
+    transition: all 0.4s ease;
+}
+
+.fade-slide-right-enter-from {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+
+.fade-slide-right-leave-to {
+    opacity: 0;
+    transform: translateX(100%);
+}
+
+#dropdown-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+
+}
+.quiz-cards-container {
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+  padding: 0 0.5rem;
+  box-sizing: border-box;
+}
+#search {
+  max-width: 40%;
+}
+.dropdown {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-wrap: nowrap;
+}
 .dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background-color: #777;
-    cursor: pointer;
-    transition: all 0.3s ease;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: #777;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-
 .dot.active {
-    background-color: #004d1a;
-    transform: scale(1.2);
+  background-color: #004d1a;
+  transform: scale(1.2);
 }
-
-/* QuizCard component assumed styles */
-.quiz-title {
-    background: rgba(0, 0, 0, 0.7);
-    padding: 8px;
-    font-weight: bold;
+.prof-user-stats-content{
+    background-color: transparent;
+    border: none;
+    padding: 0 1rem;
 }
-
-.start-btn {
-    border-radius: 0 !important;
-    background-color: #004d1a !important;
-    display: flex;
-    justify-content: space-between !important;
+.quiz-section{
+    background-color: #322E38;
+    padding: 0;
+    border: none;
+    margin: 0.5rem 0;
+    border-radius: 10px;
 }
 
 
-@media (max-width: 768px) {
-    .quiz-cards {
-        padding: 0 10px;
-        gap: 10px;
-    }
-}
-
-@media (max-width: 480px) {
-    .quiz-cards {
-        flex-direction: column;
-        padding: 0 5px;
-    }
-}
 </style>
