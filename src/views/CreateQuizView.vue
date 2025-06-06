@@ -201,7 +201,6 @@ const handleDrop = (event: DragEvent) => {
 };
 
 const handleFile = (file: File) => {
-  // Clear previous messages
   errorMessage.value = '';
   successMessage.value = '';
   
@@ -259,6 +258,7 @@ const proceedToNext = () => {
   background-color: #333;
   color: white;
   height: calc(100vh - 60px);
+  overflow-x: hidden;
 }
 
 .main-content {

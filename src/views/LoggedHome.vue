@@ -304,13 +304,13 @@ const likedSort = ref('Najnowsze');
 const suggestedSort = ref('Najnowsze');
 const yourSort = ref('Najnowsze');
 
-// Pagination state
+// Pagination
 const likedCurrentPage = ref(0);
 const suggestedCurrentPage = ref(0);
 const yourCurrentPage = ref(0);
 const itemsPerPage = 4; // Number of cards visible at once
 
-// Select options
+
 const likedSortOptions = [
   { label: 'Najnowsze', value: 'created_at' },  // na podstawie created_at z tabeli Quizzes
   { label: 'Alfabetycznie', value: 'title' },   // na podstawie title z tabeli Quizzes
@@ -333,18 +333,11 @@ const likedQuizzes = ref([]);
 const suggestedQuizzes = ref([]);
 const yourQuizzes = ref([]);
 
-// Testowy token wygenerowany z pomocą Postmana
-const token =  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTcsImVtYWlsIjoibWljaGFsQGdtYWlsLmNvbSIsImlhdCI6MTc0OTEzMzA1OH0.fACyGl1pVlIdz3HMSU8JBm3ys2sJ0HH2Amt4faW19eA"
-
-const headers = {
-  Authorization: `Bearer ${token}`
-}
 
 const fetchLikedQuizzes = async () => {
   try {
     const res = await axios.get(
-      `/quizes/liked?sort_by=${likedSort.value}`,
-      { headers }
+      `/quizes/liked?sort_by=${likedSort.value}`
     );
     likedQuizzes.value = res.data;
     likedCurrentPage.value = 0;
@@ -359,8 +352,7 @@ const fetchSuggestedQuizzes = async () => {
     const offset = 0;
 
     const res = await axios.get(
-      `/quizes/suggested?sort_by=${suggestedSort.value}&limit=${limit}&offset=${offset}`,
-      { headers }
+      `/quizes/suggested?sort_by=${suggestedSort.value}&limit=${limit}&offset=${offset}`
     );
     suggestedQuizzes.value = res.data.data;
     suggestedCurrentPage.value = 0;
@@ -375,8 +367,7 @@ const fetchYourQuizzes = async () => {
     const offset = 0;
 
     const res = await axios.get(
-      `/quizes?limit=${limit}&offset=${offset}`,
-      { headers }
+      `/quizes/own?sort_by=${yourSort.value}&limit=${limit}&offset=${offset}`
     );
 
     yourQuizzes.value = res.data.data;

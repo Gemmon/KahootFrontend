@@ -272,7 +272,6 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 
-
 // Reactive state
 const isEditMode = computed(() => route.query.mode === 'edit');
 const quizId = computed(() => route.query.id);
