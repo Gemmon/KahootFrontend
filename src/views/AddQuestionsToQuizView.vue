@@ -258,18 +258,8 @@ import {
 } from '@vicons/ionicons5';
 import router from '@/router';
 import { useRoute } from 'vue-router';
+
 const route = useRoute();
-
-// Props to determine if we're in edit mode and what quiz to edit
-interface Props {
-  editMode?: boolean;
-  quizToEdit?: any;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  editMode: false,
-  quizToEdit: null
-});
 
 
 // Reactive state
@@ -284,7 +274,6 @@ const editForm = reactive({
   image: ''
 });
 
-// Quiz data structure - will be populated based on mode
 const quizData = reactive({
   title: '',
   description: '',
@@ -310,22 +299,14 @@ const currentQuestionData = computed(() => {
 
 // Initialize data based on mode
 onMounted(() => {
-  if (isEditMode.value && props.quizToEdit) {
-    // Load existing quiz data
-    Object.assign(quizData, props.quizToEdit);
-    Object.assign(editForm, {
-      title: props.quizToEdit.title,
-      description: props.quizToEdit.description,
-      image: props.quizToEdit.image
-    });
-  } else {
-    // Initialize with default data for new quiz
-    Object.assign(editForm, {
-      title: quizData.title || '',
-      description: quizData.description || '',
-      image: quizData.image || ''
-    });
-  }
+    editForm.title = String(route.query.title || '');
+    editForm.description = String(route.query.description || '');
+    editForm.image = String(route.query.image || '');
+
+    quizData.title = editForm.title;
+    quizData.description = editForm.description;
+    quizData.image = editForm.image;
+
 });
 
 // Methods
