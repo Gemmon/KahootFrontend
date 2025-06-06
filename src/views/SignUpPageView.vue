@@ -74,7 +74,6 @@ const formRules = ref({
 const handleRegister = async (e?: MouseEvent | KeyboardEvent) => {
     if (e) e.preventDefault()
     
-    // Reset previous errors
     emailStatus.value = undefined
     emailFeedback.value = ''
     usernameStatus.value = undefined
@@ -102,13 +101,11 @@ const handleRegister = async (e?: MouseEvent | KeyboardEvent) => {
                 
             } catch (error: any) {
                 console.error('Registration error:', error)
-                
-                // Obsługa błędu "User already exists"
+
                 if (error.response?.status === 400 && error.response?.data?.message === "User already exists") {
                     emailStatus.value = 'error'
                     emailFeedback.value = 'This email is already registered.'
                 } else {
-                    // Ogólny błąd
                     alert(error.response?.data?.message || 'Registration failed. Please try again.')
                 }
             } finally {

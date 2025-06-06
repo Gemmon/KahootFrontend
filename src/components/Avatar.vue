@@ -43,11 +43,11 @@ const dropdownOptionsLogged = [
 
 const dropdownOptionsLoggedOut = [
   {
-    label: 'Log In',
+    label: 'Zaloguj',
     key: 'login'
   },
   {
-    label: 'Sign Up',
+    label: 'Zarejestruj',
     key: 'signup'
   }
 ]
@@ -62,7 +62,7 @@ const goToSignup = () => {
 
 const logout = () => {
   authStore.clearToken()
-  router.push('/')
+  router.push('/login')
 }
 
 const handleSelect = (key: string) => {
