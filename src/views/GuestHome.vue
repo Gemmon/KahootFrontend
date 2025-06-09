@@ -7,14 +7,14 @@
           <h4>Search for interesting quizzes or enter a code to join your friends in a lobby!</h4>
         </div>
         <div id="join-container">
-          <h3 class="join-title">Enter Code</h3>
+          <h3 class="join-title">Podaj kod gry</h3>
             <n-input 
               v-model:value="joinCode" 
               type="text" 
               :placeholder="errorMessage ? errorMessage : 'Code'" 
               class="join-input"
             />
-            <n-button type="primary" class="join-button" @click="handleJoin">Join</n-button>
+            <n-button type="primary" class="join-button" @click="handleJoin">Dołącz</n-button>
         </div>
       </div>
       <div class="toolbar-container">
@@ -97,6 +97,9 @@ import { ChevronBack as ChevronBackIcon, ChevronForward as ChevronForwardIcon } 
 
 import QuizCard from '@/components/QuizCard.vue';
 import { useRouter } from 'vue-router';
+import { useGameStore } from '@/stores/gameStore';
+
+const gameStore = useGameStore();
 const router = useRouter();
 
 const goToCreateLobby = (quiz: any) => {
@@ -105,14 +108,21 @@ const goToCreateLobby = (quiz: any) => {
 
 const joinCode = ref('')
 const errorMessage = ref('')
-const handleJoin = () => {
+const handleJoin = async () => {
   if (joinCode.value.trim()) {
-    console.log(`Joining with code: ${joinCode.value}`)
+    console.log(`Dołączanie do gry: ${joinCode.value}`)
     errorMessage.value = ''
-
+    try {
+      await gameStore.joinGame(joinCode.value.trim())
+      console.log('Dołączono do gry:', joinCode.value)
+      router.push('/lobby-guest')
+    }
+    catch (error) {
+      console.error('Błąd podczas dołączania:', error)
+      errorMessage.value = 'Błąd podczas dołączania:' + error
+    }
   } else {
-    errorMessage.value = 'No such game!'
-    console.log('No code entered')
+    errorMessage.value = 'Nie podano kodu!'
   }
 }
 const SearchFor = ref("");

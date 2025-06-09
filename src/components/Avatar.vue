@@ -56,6 +56,10 @@ const goToLogin = () => {
   router.push('/login')
 }
 
+const goToSettings = () => {
+  router.push('/profile')
+}
+
 const goToSignup = () => {
   router.push('/signup')
 }
@@ -80,7 +84,11 @@ const handleSelect = (key: string) => {
     case 'login':
       goToLogin()
       break
-    
+
+    case 'settings':
+      goToSettings()
+      break
+
     case 'signup':
       goToSignup()
       break

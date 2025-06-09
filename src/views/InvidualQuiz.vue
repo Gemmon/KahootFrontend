@@ -169,9 +169,12 @@ import { HeartFilled } from '@vicons/antd';
 import router from '@/router';
 import axios from 'axios';
 import { quizStore } from '@/stores/quizStore';
-
-// Get route params
 const route = useRoute();
+import { useGameStore } from '@/stores/gameStore';
+
+// Test variable 
+const mine = ref(true);
+const gameStore = useGameStore();
 
 // Reactive state
 const loading = ref(true);
@@ -276,11 +279,19 @@ const toggleLike = async () => {
   }
 };
 
-const startQuiz = () => {
+const startQuiz = async () => {
   // Logic to start the quiz
   currentQuestionIndex.value = 0;
   selectedAnswer.value = null;
   completedQuestions.value.length = 0;
+
+  try {
+    if (await gameStore.hostGame(quiz.id)) {
+      router.push('/lobby-host')
+    }
+  } catch (error) {
+    console.error('Error starting the quiz:', error);
+  }
 };
 
 const editQuiz = () => {
