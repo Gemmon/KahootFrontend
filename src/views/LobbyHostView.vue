@@ -161,6 +161,7 @@ div {
   gap: 15px;
   margin-bottom: 15px;
   margin-top: 15px;
+  flex-wrap: wrap;;
 }
 
 .user-card {

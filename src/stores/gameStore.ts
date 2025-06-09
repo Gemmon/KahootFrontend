@@ -3,7 +3,6 @@ import type { Socket } from 'socket.io-client'
 import { defineStore } from 'pinia'
 import { waitFor } from '@/utils';
 import type { NotificationApiInjection } from 'naive-ui/es/notification/src/NotificationProvider';
-import { c } from 'naive-ui';
 
 interface GamePlayer {
   uuid: string;
@@ -80,9 +79,9 @@ export const useGameStore = defineStore('game', {
         console.log('Zaktualizowano stan:', { state, question, questionNumber })
         this.state = state
         this.distribution = {};
-        if (question)
+        if (question !== undefined)
           this.questionIndex = question
-        if (questionNumber)
+        if (questionNumber !== undefined)
           this.questionNumber = questionNumber
       })
       this.socket.on('game:question:distribution', (distribution: Record<number, number>) => {
