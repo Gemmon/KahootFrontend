@@ -45,9 +45,11 @@
                     <div class="quiz-card" v-for="(quiz, index) in chunk" :key="'liked-'+chunkIndex+'-'+index" >
                       <div class="quiz-image" :style="{ backgroundImage: `url(${quiz.image})` }">
                         <div class="quiz-actions">
-                          <n-button quaternary circle>
+                          <n-button quaternary circle @click="toggleLike(quiz)">
                             <template #icon>
-                              <n-icon><HeartFilled /></n-icon>
+                              <n-icon>
+                                <component :is="quiz.is_liked ? HeartFilled : HeartOutline" />
+                              </n-icon>
                             </template>
                           </n-button>
                         </div>
@@ -127,9 +129,11 @@
                     <div class="quiz-card" v-for="(quiz, index) in chunk" :key="'suggested-'+chunkIndex+'-'+index">
                       <div class="quiz-image" :style="{ backgroundImage: `url(${quiz.image})` }">
                         <div class="quiz-actions">
-                          <n-button quaternary circle>
+                          <n-button quaternary circle @click="toggleLike(quiz)">
                             <template #icon>
-                              <n-icon><HeartOutline /></n-icon>
+                              <n-icon>
+                                <component :is="quiz.is_liked ? HeartFilled : HeartOutline" />
+                              </n-icon>
                             </template>
                           </n-button>
                         </div>
@@ -207,9 +211,11 @@
                     <div class="quiz-card" v-for="(quiz, index) in chunk" :key="'your-'+chunkIndex+'-'+index">
                       <div class="quiz-image" :style="{ backgroundImage: `url(${quiz.image})` }">
                         <div class="quiz-actions">
-                          <n-button quaternary circle>
+                          <n-button quaternary circle @click="toggleLike(quiz)">
                             <template #icon>
-                              <n-icon><HeartOutline /></n-icon>
+                              <n-icon>
+                                <component :is="quiz.is_liked ? HeartFilled : HeartOutline" />
+                              </n-icon>
                             </template>
                           </n-button>
                         </div>
@@ -298,6 +304,7 @@ import {
 } from '@vicons/ionicons5';
 import { HeartFilled } from '@vicons/antd';
 import router from '@/router';
+
 // Reactive state
 const showJoinModal = ref(false);
 const likedSort = ref('created_at');
@@ -392,7 +399,7 @@ watch(yourSort, () => {
 
 const goToQuiz = (id: number): void => {
   console.log("Przekazuje id " + id);
-  router.push({ name: 'individual', query: { mine: "true", quizId: id} });
+  router.push({ name: 'individual', query: { quizId: id} });
 };
 
 // Helper function to chunk an array into smaller arrays
@@ -445,6 +452,22 @@ const goToPage = (section: any, pageIndex: number) => {
 const toggleJoinModal = () => {
   showJoinModal.value = !showJoinModal.value;
 };
+
+const toggleLike = async (quiz: any) => {
+  try {
+    if (quiz.is_liked) {
+      await axios.delete(`/quizes/${quiz.id}/favourite`);
+      quiz.is_liked = false;
+    } else {
+      await axios.post(`/quizes/${quiz.id}/favourite`);
+      quiz.is_liked = true;
+    }
+  } catch (err: any) {
+    console.error('Błąd przy toggle like:', err);
+    alert("Wystąpił błąd przy próbie polubienia quizu")
+  }
+};
+
 
 // Pobranie wszystkich potrzebnych danych przy wczytaniu strony
 onMounted(() => {

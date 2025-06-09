@@ -261,9 +261,19 @@ const fetchQuiz = async () => {
 };
 
 // Methods
-const toggleLike = () => {
-  isLiked.value = !isLiked.value;
-  // TODO: Send like/unlike request to backend Nie ma endpointu
+const toggleLike = async () => {
+  try {
+    if (isLiked.value) {
+      await axios.delete(`/quizes/${quiz.id}/favourite`);
+      isLiked.value = false;
+    } else {
+      await axios.post(`/quizes/${quiz.id}/favourite`);
+      isLiked.value = true;
+    }
+  } catch (err: any) {
+    console.error('Błąd przy toggle like:', err);
+    error.value = 'Nie udało się zmienić polubienia quizu.';
+  }
 };
 
 const startQuiz = () => {
@@ -275,7 +285,7 @@ const startQuiz = () => {
 
 const editQuiz = () => {
   quizStore.currentQuiz = JSON.parse(JSON.stringify(quiz));
-  router.push({ name: 'quiz-questions', query: { mode: 'edit' } });
+  router.push({ name: 'quiz-questions', query: { mode: 'edit', id: quiz.id } });
 };
 
 const selectAnswer = (index: number) => {

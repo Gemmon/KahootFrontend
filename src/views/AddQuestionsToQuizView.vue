@@ -19,7 +19,17 @@
               </template>
               Edytuj Opis
             </n-button>
-            
+            <n-button 
+              v-if="isEditMode" 
+              type="error" 
+              class="delete-quiz-button" 
+              @click="deleteEntireQuiz"
+            >
+              <template #icon>
+                <n-icon><TrashIcon /></n-icon>
+              </template>
+              Usuń Quiz
+            </n-button>
             <n-button 
               :type="isEditMode ? 'warning' : 'success'" 
               class="action-button" 
@@ -174,7 +184,6 @@
       </div>
     </div>
 
-    <!-- Description Edit Modal -->
     <n-modal v-model:show="showDescriptionModal">
       <n-card
         style="width: 600px"
@@ -305,7 +314,6 @@ onMounted(() => {
     // Pobierz dane quizu z quizStore
     const quiz = quizStore.currentQuiz;
 
-    // Podstawowe dane
     editForm.title = quiz.title;
     editForm.description = quiz.description;
     editForm.image = quiz.image;
@@ -314,7 +322,6 @@ onMounted(() => {
     quizData.description = quiz.description;
     quizData.image = quiz.image;
 
-    // Pytania
     quizData.questions = quiz.questions.map((question: any) => ({
       text: question.text,
       image: question.image || '',
@@ -408,7 +415,6 @@ const validateQuiz = () => {
     return false;
   }
 
-  // Check if all questions have text and at least one answer
   for (let i = 0; i < quizData.questions.length; i++) {
     const question = quizData.questions[i];
     if (!question.text.trim()) {
@@ -455,6 +461,23 @@ const cancelAction = () => {
   }
 };
 
+const deleteEntireQuiz = async () => {
+  console.log(quizId.value);
+  if (!quizId.value) return;
+
+  const confirmed = confirm('Czy na pewno chcesz usunąć ten quiz? Tej operacji nie można cofnąć.');
+
+  if (!confirmed) return;
+
+  try {
+    await axios.delete(`/quizes/${quizId.value}`);
+    alert('Quiz został usunięty.');
+    router.push('/');
+  } catch (err: any) {
+    console.error(err);
+    alert('Wystąpił błąd podczas usuwania quizu.');
+  }
+};
 
 const submitQuiz = async () => {
   try {
@@ -550,6 +573,20 @@ const formatQuizPayload = () => {
 .edit-description-button:hover {
   transform: scale(1.05) !important;
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.5) !important;
+}
+.delete-quiz-button {
+  background-color: #7f1d1d !important;
+  color: white !important;
+  border-radius: 12px !important;
+  padding: 5px 22px !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  height: 50px !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.delete-quiz-button:hover {
+  background-color: #991b1b !important;
 }
 
 .action-button {
