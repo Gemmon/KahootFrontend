@@ -27,7 +27,7 @@
             </n-button>
           </template>
           <div class="join-popover-content">
-            <h3 class="join-title">Enter Code</h3>
+            <h3 class="join-title">Podaj kod gry</h3>
             <n-input 
               v-model:value="joinCode" 
               type="text" 
@@ -35,7 +35,7 @@
               class="join-input"
             />
             <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>
-            <n-button type="primary" class="join-button" @click="handleJoin">Join</n-button>
+            <n-button type="primary" class="join-button" @click="handleJoin">Dołącz</n-button>
           </div>
         </n-popover>
         <n-button @click="goToExplore" class="nav-btn" quaternary type="primary">
@@ -59,14 +59,18 @@ import {
   NIcon, 
   NLayoutHeader,
   NPopover,
-  NInput
+  NInput,
+  useNotification
 } from 'naive-ui'
 import { 
   Add as AddIcon, 
   PersonAdd as PersonAddIcon 
 } from '@vicons/ionicons5'
 import { CompassOutline as CompassOutlineIcon } from '@vicons/ionicons5'
+import { useGameStore } from '@/stores/gameStore';
 
+const gameStore = useGameStore();
+gameStore.notifications = useNotification();
 
 const props = defineProps<{
   isLogged: Boolean
@@ -75,19 +79,25 @@ const props = defineProps<{
 const joinCode = ref('')
 const showJoinPopover = ref(false)
 const errorMessage = ref('')
+const router = useRouter();
 
-const handleJoin = () => {
+const handleJoin = async () => {
   if (joinCode.value.trim()) {
-    console.log(`Joining with code: ${joinCode.value}`)
+    console.log(`Dołączanie do gry: ${joinCode.value}`)
     errorMessage.value = ''
-    showJoinPopover.value = false
-
+    try {
+      await gameStore.joinGame(joinCode.value.trim())
+      console.log('Dołączono do gry:', joinCode.value)
+      router.push('/lobby-guest')
+    }
+    catch (error) {
+      console.error('Błąd podczas dołączania:', error)
+      errorMessage.value = 'Błąd podczas dołączania:' + error
+    }
   } else {
-    errorMessage.value = 'No such game!'
-    console.log('No code entered')
+    errorMessage.value = 'Nie podano kodu!'
   }
 }
-const router = useRouter();
 
 const goToHome = () =>{
 

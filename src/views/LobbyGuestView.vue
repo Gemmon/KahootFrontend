@@ -2,7 +2,7 @@
     <div class="home">
       <div class="main-content">
         <div class="header">
-          <h2>Example Lobby</h2>
+          <p>{{ store.username }}</p>
         </div>
         <div class="lobby-container">
           <n-scrollbar style="max-height: 50vh;">
@@ -10,9 +10,9 @@
             <!-- Renders each user row dynamically -->
             <div class="user-row">
               <!-- Renders each user card with specific class based on host or special guest -->
-              <div class="user-card" :class="{ 'host-card': isHost(user), 'special-guest': isSpecialGuest(user) }" v-for="(user, idx) in users" :key="idx">
-                  <img class="avatar-img" :src="`/assets/default-avatar.jpg`" alt="User Avatar" />
-                  <p>{{ user }}</p>
+              <div class="user-card" :class="{ 'host-card': user.isHost, 'special-guest': user.uuid === store.uuid }" v-for="(user, idx) in store.players" :key="idx">
+                <img class="avatar-img" :src="getAvatarUrl(user.username)" :alt="'Avatar of ' + user.username" />
+                <p>{{ user.username }}</p>
               </div>
             </div>
           </div>
@@ -20,11 +20,11 @@
         </div>
         <div class="bottom-section">
           <div class="quiz-side">
-            <h3 class="quiz-heading">Chosen Quiz</h3>
+            <h3 class="quiz-heading">Wybrany quiz</h3>
             <!-- Displaying the selected quiz card -->
             <div class="quiz-card">
-              <div class="quiz-image" :style="{ backgroundImage: `url(${chosenQuiz.image})` }">
-                <div class="quiz-title">{{ chosenQuiz.title }}
+              <div class="quiz-image" :style="{ backgroundImage: `url(${quizImage})` }">
+                <div class="quiz-title">{{ quizTitle }}
                   <div class="quiz-footer">
                     <div class="info-icon">
                       <n-icon size="20">
@@ -32,7 +32,7 @@
                       </n-icon>
                     </div>
                     <div class="quiz-author">
-                      <span class="author-label">Made by</span>
+                      <span class="author-label">Autor</span>
                       <img class="avatar-small" :src="`/assets/default-avatar.jpg`" alt="Author Avatar" />
                     </div>
                   </div>
@@ -43,7 +43,7 @@
           <div class="button-side">
             <!-- Leave button functionality -->
             <n-button type="error" size="large" @click="leaveLobby">
-              Leave
+              Wyjdź
             </n-button>
           </div>
         </div>
@@ -52,31 +52,31 @@
   </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { NScrollbar, NButton, NIcon } from 'naive-ui';
 import { InformationCircleOutline } from '@vicons/ionicons5'
-
-// Sample user list
-const users = ref([
-  'John Doe', 'Jane Doe', 'Alice', 'Bob',
-  'Charlie', 'Dave', 'Eve', 'Frank', 'Grace', 'Hank', 
-  '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
-
-// Function to check if the user is a host or a special guest
-const isHost = (user: string) => user === 'John Doe';
-const isSpecialGuest = (user: string) => user === 'Jane Doe';
-
-const chosenQuiz = ref({
-  title: 'Star Wars',
-  image: 'https://placehold.co/300x150/0000FF/FFFFFF?text=Star%20Wars'
-})
+import { useGameStore } from '@/stores/gameStore'
+import { getAvatarUrl } from '@/utils';
 
 const router = useRouter()
-
-function leaveLobby() {
+const store = useGameStore()
+if (store.socket === null) {
   router.push('/')
 }
+const quizImage = computed(() => `https://placehold.co/300x150/0000FF/FFFFFF?text=${encodeURIComponent(quizTitle.value)}`);
+const quizTitle = computed(() => store.quiz?.title || 'Gahut Quiz');
+
+function leaveLobby() {
+  store.disconnectSocket()
+  router.push('/')
+}
+
+watch(() => store.state, (newState) => {
+  if (newState === 'playing') {
+    router.push('/question');
+  }
+}, { immediate: true });
 </script>
 
 <style scoped>
@@ -100,11 +100,10 @@ div {
 }
 
 .header {
-  background-color: #4CAF50; 
-  border-radius: 8px;        
-  padding: 15px 20px;        
-  display: inline-block;
+  display: flex;
+  justify-content: space-between;
   margin-right: 100%;
+  width: 100%;
 }
 
 .header h2 {
@@ -112,6 +111,17 @@ div {
   margin: 0;
   font-size: 32px;
   white-space: nowrap;
+  background-color: #4CAF50; 
+  border-radius: 8px;
+  padding: 15px 20px;
+}
+
+.header p {
+  color: white;
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  align-self: center;
 }
 
 .lobby-container {
@@ -143,6 +153,7 @@ div {
   border-radius: 8px;
   text-align: center;
   width: 130px;
+  flex: 0 0 14%;
 }
 
 /* Host: golden gradient */

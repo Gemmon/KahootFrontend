@@ -6,36 +6,36 @@
       <div class="main-section">
         <!-- Podium -->
         <div class="podium">
-          <div class="podium-wrapper">
+          <div class="podium-wrapper" v-if="podium[2]">
             <div class="place-info">
               <span class="place-label">3 miejsce</span>
-              <span class="points">{{ podium[2].score }}</span>
+              <span class="points">{{ podium[2].points }}</span>
             </div>
             <div class="podium-column place-3">
-              <img class="avatar-img" :src="avatarUrl" alt="User Avatar" />
-              <div class="username">{{ podium[2].name }}</div>
+              <img class="avatar-img" :src="getAvatarUrl(podium[2].username)" alt="User Avatar" />
+              <div class="username">{{ podium[2].username }}</div>
             </div>
           </div>
 
-          <div class="podium-wrapper">
+          <div class="podium-wrapper" v-if="podium[0]">
             <div class="place-info">
               <span class="place-label">1 miejsce</span>
-              <span class="points">{{ podium[0].score }}</span>
+              <span class="points">{{ podium[0].points }}</span>
             </div>
             <div class="podium-column place-1">
-              <img class="avatar-img" :src="avatarUrl" alt="User Avatar" />
-              <div class="username">{{ podium[0].name }}</div>
+              <img class="avatar-img" :src="getAvatarUrl(podium[0].username)" alt="User Avatar" />
+              <div class="username">{{ podium[0].username }}</div>
             </div>
           </div>
 
-          <div class="podium-wrapper">
+          <div class="podium-wrapper" v-if="podium[1]">
             <div class="place-info">
               <span class="place-label">2 miejsce</span>
-              <span class="points">{{ podium[1].score }}</span>
+              <span class="points">{{ podium[1].points }}</span>
             </div>
             <div class="podium-column place-2">
-              <img class="avatar-img" :src="avatarUrl" alt="User Avatar" />
-              <div class="username">{{ podium[1].name }}</div>
+              <img class="avatar-img" :src="getAvatarUrl(podium[1].username)" alt="User Avatar" />
+              <div class="username">{{ podium[1].username }}</div>
             </div>
           </div>
         </div>
@@ -46,13 +46,13 @@
           <div class="others-scroll">
             <div
                 v-for="(user, index) in others"
-                :key="user.name"
+                :key="user.username"
                 class="other-row"
             >
-              <img class="avatar-img" :src="avatarUrl" alt="User Avatar" />
+              <img class="avatar-img" :src="getAvatarUrl(user.username)" alt="User Avatar" />
               <div class="info">
-                <span class="name">{{ user.name }}</span>
-                <span class="points">{{ user.score }} Punktów</span>
+                <span class="name">{{ user.username }}</span>
+                <span class="points">{{ user.points }} Punktów</span>
               </div>
               <span class="rank">#{{ index + 4 }}</span>
             </div>
@@ -64,11 +64,11 @@
       <div class="local-user-wrapper">
         <div class="local-user-summary">
           <div class="local-user-avatar">
-            <img class="avatar-img" :src="avatarUrl" alt="User Avatar" />
-            <span class="local-username">{{ localUser.name }}</span>
+            <img class="avatar-img" :src="getAvatarUrl(localUser.username)" alt="User Avatar" />
+            <span class="local-username">{{ localUser.username }}</span>
           </div>
           <span class="summary-text">
-            Uzyskałeś {{ localUser.place }} miejsce, zdobywając {{ localUser.score }} punktów.
+            Uzyskałeś {{ localUser.place }} miejsce, zdobywając {{ localUser.points }} punktów.
           </span>
         </div>
       </div>
@@ -82,38 +82,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useGameStore } from '@/stores/gameStore'
+import { getAvatarUrl } from '@/utils'
 
 const router = useRouter()
+const gameStore = useGameStore()
+if (gameStore.socket === null) {
+  router.push('/')
+}
 
-const quizTitle = 'Star Wars'
+const quizTitle = gameStore.quiz?.title || "Gahut Quiz" 
 
-const avatarUrl =
-    'https://s3-alpha-sig.figma.com/img/7f45/3b75/be0afd72a8da912ec198876da8f6d800?Expires=1744588800&Key-Pair-Id=APKAQ4GOSFWCW27IBOMQ&Signature=HodTR9oNZy1HmncZcgtanXDvkQxlUGHA~Je2A2~x68fFUct6j1bN0xPCVV9v5eq3JKe6xGLcD-vsiZwZO8GXLh4HlivzjROYLlpo0LoYGWId-DcNq2l2aDScUb~Vuh6JlxN97FCxx0tRhzdFC6Cdiw1lBFpLSFzyLic1mFssEsZ9REjtA~Aa6OKgsAf8a3CKV7waAForrZLYuzsauNEnPqlyyoc8p4l3RUfpbQL-Pq8wXJ5Nft0aoHsBMhOgdJZ5vSq3Wu0DFBkdQVPKjbRb2WeMAjJzvCq4V~eXCsP5Y8~PXtIKSdDg2~rZy-9whrjexRBhRCAwgg2-dpqMSsAfpw__';
+const podium = computed(() => gameStore.ranking.slice(0, 3))
 
-const podium = ref([
-  { name: 'User 1', score: 100000 },
-  { name: 'User 2', score: 75000 },
-  { name: 'User 3', score: 50000 },
-])
+const others = computed(() => gameStore.ranking.slice(3));
 
-const others = ref([
-  { name: 'User 4', score: 40000 },
-  { name: 'User 5', score: 35000 },
-  { name: 'User 6', score: 30000 },
-  { name: 'User 7', score: 27000 },
-  { name: 'User 8', score: 25000 },
-  { name: 'User 9', score: 22000 },
-  { name: 'User 10', score: 21000 },
-  { name: 'User 11', score: 20000 },
-])
-
-const localUser = ref({
-  name: 'User 10',
-  place: 10,
-  score: 21000,
-})
+const localUser = computed(() => {
+  const user = gameStore.ranking.find(u => u.uuid === gameStore.uuid);
+  return {
+    username: user?.username || 'Ty',
+    points: user?.points || 0,
+    place: user ? gameStore.ranking.indexOf(user) + 1 : 0
+  };
+});
 
 const dissolveLobby = () => {
   console.log('Rozwiązano lobby')

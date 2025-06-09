@@ -5,8 +5,8 @@
       :key="answer.id"
       class="distribution-bar"
       :class="{
-        correct: answer.id === correctAnswerId,
-        wrong: answer.id !== correctAnswerId,
+        correct: answer.is_correct,
+        wrong: !answer.is_correct,
         selected: answer.id === selectedAnswerId
       }"
       :style="{
@@ -25,20 +25,20 @@
 import { computed } from 'vue';
 
 const props = defineProps<{
-  answers: { id: string; text: string }[];
-  correctAnswerId: string;
-  selectedAnswerId: string | null;
-  votes: Record<string, number>;
+  answers: Answer[];
+  correctAnswerId: number;
+  selectedAnswerId: number | null;
+  votes: Record<number, number>;
 }>();
 
-function getBarWidth(id: string) {
+function getBarWidth(id: number) {
   const allVotes = Object.values(props.votes);
   const max = Math.max(...allVotes, 1); // jak nic nie ma, to przynajmniej 1
   const value = props.votes[id] ?? 0;
   return (value / max) * 100;
 }
 
-function getBarColor(id: string) {
+function getBarColor(id: number) {
   if (id === props.correctAnswerId) return '#00b7ff';
   if (id === props.selectedAnswerId) return '#f44336';
   return '#ccc'; // neutralny

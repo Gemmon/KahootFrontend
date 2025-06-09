@@ -152,8 +152,10 @@ import {
 } from '@vicons/ionicons5';
 import { HeartFilled } from '@vicons/antd';
 import router from '@/router';
+import { useGameStore } from '@/stores/gameStore';
 // Test variable 
 const mine = ref(true);
+const gameStore = useGameStore();
 
 // Reactive state
 const isLiked = ref(false);
@@ -228,11 +230,19 @@ const toggleLike = () => {
   isLiked.value = !isLiked.value;
 };
 
-const startQuiz = () => {
+const startQuiz = async () => {
   // Logic to start the quiz
   currentQuestionIndex.value = 0;
   selectedAnswer.value = null;
   completedQuestions.value.length = 0;
+
+  try {
+    if (await gameStore.hostGame(quiz.id)) {
+      router.push('/lobby-host')
+    }
+  } catch (error) {
+    console.error('Error starting the quiz:', error);
+  }
 };
 
 const editQuiz = () => {

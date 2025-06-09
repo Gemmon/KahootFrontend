@@ -1,7 +1,7 @@
 <template>
   <section class="question-container">
     <div class="question-wrapper">
-      <img :src="backgroundImage" class="background-image" alt="" />
+      <!-- <img :src="backgroundImage" class="background-image" alt="" /> -->
       <div class="question-content">
         <h2 class="question-text">{{ question }}</h2>
         <div class="answers-grid">
@@ -15,14 +15,14 @@
                 class="answer-option"
                 :class="{
                   selected: selectedAnswerId === answer.id && !showResult,
-                  correct: showResult && answer.id === correctAnswerId,
-                  wrong: showResult && selectedAnswerId === answer.id && answer.id !== correctAnswerId,
-                  disabled: showResult
+                  correct: showResult && answer.is_correct,
+                  wrong: showResult && selectedAnswerId === answer.id && !answer.is_correct,
+                  disabled: showResult || selectedAnswerId !== null
                 }"
                 @click="selectAnswer(answer.id)"
               >
                 <span class="option-letter">{{ String.fromCharCode(65 + index) }}</span>
-                <p class="option-text">{{ answer.text }}</p>
+                <p class="option-text">{{ answer.content }}</p>
               </div>
             </div>
           </div>
@@ -37,24 +37,19 @@ import { ref, defineProps, defineEmits } from "vue";
 
 const props = defineProps<{
   question: string;
-  answers: {
-    id: string;
-    text: string;
-  }[];
+  answers: Answer[];
   backgroundImage: string;
-  selectedAnswerId: string | null;
-  correctAnswerId: string;
   showResult: boolean;
 }>();
 
 const emit = defineEmits<{
-  (e: "answerSelected", answerId: string): void;
+  (e: "answerSelected", answerId: number): void;
 }>();
 
-const selectedAnswerId = ref<string | null>(null);
+const selectedAnswerId = defineModel<number | null>({ required: true });
 
-function selectAnswer(id: string) {
-  if (props.showResult) {
+function selectAnswer(id: number) {
+  if (props.showResult || selectedAnswerId.value !== null) {
     // Jeśli pokazujemy wynik, blokujemy zmianę wyboru
     return;
   }

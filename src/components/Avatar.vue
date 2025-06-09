@@ -1,5 +1,5 @@
 <template>
-  <n-dropdown trigger="click" :options="isLogged ? dropdownOptionsLogged : dropdownOptionsLoggedOut"
+  <n-dropdown trigger="click" :options="authStore.isAuthenticated ? dropdownOptionsLogged : dropdownOptionsLoggedOut"
     @select="handleSelect">
     <div class="user-profile">
       <n-avatar round src="https://placehold.co/40" />
@@ -8,77 +8,107 @@
 </template>
 
 <script setup lang="ts">
-
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import {
   NAvatar,
   NDropdown,
 } from 'naive-ui'
 
 import { useRouter } from 'vue-router'
-const router = useRouter()
+import { useAuthStore } from '@/stores/auth'
 
-const props = defineProps<{
-  isLogged: Boolean
-}>()
+const router = useRouter()
+const authStore = useAuthStore()
 
 const userHasQuizHistory = ref(true) // TODO: zastąp prawdziwym warunkiem czy uzytkownik ma historię quizów
 
 const dropdownOptionsLogged = [
   {
-    label: 'Settings',
-    key: 'settings'
+    label: 'Profil',
+    key: 'profile'
   },
   {
-    label: 'History',
+    label: 'Historia',
     key: 'history'
   },
   {
-    label: 'Switch Accounts',
+    label: 'Przełącz konto',
     key: 'switch-accounts'
   },
   {
-    label: 'Log Out',
+    label: 'Wyloguj',
     key: 'logout'
   }
 ]
 
 const dropdownOptionsLoggedOut = [
   {
-    label: 'Log In',
+    label: 'Zaloguj',
     key: 'login'
   },
   {
-    label: 'Log Out',
-    key: 'logout'
+    label: 'Zarejestruj',
+    key: 'signup'
   }
 ]
 
 const goToLogin = () => {
   router.push('/login')
 }
+
 const goToSettings = () => {
   router.push('/profile')
 }
 
-  const handleSelect = (key: string) => {
-    console.log(`Selected: ${key}`)
+const goToSignup = () => {
+  router.push('/signup')
+}
 
-    if (key === 'history') {
+const logout = () => {
+  authStore.clearToken()
+  router.push('/login')
+}
+
+const handleSelect = (key: string) => {
+  console.log(`Selected: ${key}`)
+
+  switch (key) {
+    case 'history':
       if (userHasQuizHistory.value) {
         router.push('/history')
       } else {
         router.push('/history-empty')
       }
-    }
-    if (String(key) == 'login') {
+      break
+    
+    case 'login':
       goToLogin()
-    }
-    if (String(key) == 'settings') {
-      goToSettings()
-    }
-  }
 
+    case 'settings':
+      goToSettings()
+      break
+
+    case 'signup':
+      goToSignup()
+      break
+    
+    case 'logout':
+      logout()
+      break
+    
+    case 'profile':
+      router.push('/profile')
+      break
+    
+    case 'switch-accounts':
+      // Implementuj logikę przełączania kont
+      console.log('Switch accounts functionality')
+      break
+    
+    default:
+      console.log(`Unhandled action: ${key}`)
+  }
+}
 </script>
 
 <style scoped>
