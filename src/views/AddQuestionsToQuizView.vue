@@ -19,7 +19,17 @@
               </template>
               Edytuj Opis
             </n-button>
-            
+            <n-button 
+              v-if="isEditMode" 
+              type="error" 
+              class="delete-quiz-button" 
+              @click="deleteEntireQuiz"
+            >
+              <template #icon>
+                <n-icon><TrashIcon /></n-icon>
+              </template>
+              Usuń Quiz
+            </n-button>
             <n-button 
               :type="isEditMode ? 'warning' : 'success'" 
               class="action-button" 
@@ -174,7 +184,6 @@
       </div>
     </div>
 
-    <!-- Description Edit Modal -->
     <n-modal v-model:show="showDescriptionModal">
       <n-card
         style="width: 600px"
@@ -258,18 +267,10 @@ import {
 } from '@vicons/ionicons5';
 import router from '@/router';
 import { useRoute } from 'vue-router';
+import axios from 'axios';
+import { quizStore } from '@/stores/quizStore';
+
 const route = useRoute();
-
-// Props to determine if we're in edit mode and what quiz to edit
-interface Props {
-  editMode?: boolean;
-  quizToEdit?: any;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  editMode: false,
-  quizToEdit: null
-});
 
 
 // Reactive state
@@ -284,7 +285,6 @@ const editForm = reactive({
   image: ''
 });
 
-// Quiz data structure - will be populated based on mode
 const quizData = reactive({
   title: '',
   description: '',
@@ -310,22 +310,39 @@ const currentQuestionData = computed(() => {
 
 // Initialize data based on mode
 onMounted(() => {
-  if (isEditMode.value && props.quizToEdit) {
-    // Load existing quiz data
-    Object.assign(quizData, props.quizToEdit);
-    Object.assign(editForm, {
-      title: props.quizToEdit.title,
-      description: props.quizToEdit.description,
-      image: props.quizToEdit.image
-    });
+  if (isEditMode.value && quizStore.currentQuiz) {
+    // Pobierz dane quizu z quizStore
+    const quiz = quizStore.currentQuiz;
+
+    editForm.title = quiz.title;
+    editForm.description = quiz.description;
+    editForm.image = quiz.image;
+
+    quizData.title = quiz.title;
+    quizData.description = quiz.description;
+    quizData.image = quiz.image;
+
+    quizData.questions = quiz.questions.map((question: any) => ({
+      text: question.text,
+      image: question.image || '',
+      correctAnswer: question.correctAnswer ?? 0,
+      answers: question.answers.map((a: any) => a.text)
+    }));
   } else {
-    // Initialize with default data for new quiz
-    Object.assign(editForm, {
-      title: quizData.title || '',
-      description: quizData.description || '',
-      image: quizData.image || ''
-    });
+    // Tryb tworzenia nowego quizu — ustaw dane z route
+    editForm.title = String(route.query.title || '');
+    editForm.description = String(route.query.description || '');
+    editForm.image = String(route.query.image || '');
+
+    quizData.title = editForm.title;
+    quizData.description = editForm.description;
+    quizData.image = editForm.image;
   }
+
+  if (isEditMode.value && !quizStore.currentQuiz) {
+  alert('Brak danych quizu do edycji. Przejdź ponownie przez ekran główny.');
+  router.push('/');
+}
 });
 
 // Methods
@@ -398,7 +415,6 @@ const validateQuiz = () => {
     return false;
   }
 
-  // Check if all questions have text and at least one answer
   for (let i = 0; i < quizData.questions.length; i++) {
     const question = quizData.questions[i];
     if (!question.text.trim()) {
@@ -416,21 +432,19 @@ const validateQuiz = () => {
   return true;
 };
 
+// Do dodania nowego quizu
 const publishQuiz = () => {
   if (!validateQuiz()) return;
-  
-  // Here send the data to backend
-  console.log('Publishing quiz:', quizData);
-  alert('Quiz został opublikowany!');
+  submitQuiz();
+  alert("Quiz został opublikowany")
+  router.push("/");
 };
 
+// Do edytowania istniejąceo quizu
 const saveChanges = () => {
   if (!validateQuiz()) return;
-  
-  // Here update the existing quiz in backend
-  console.log('Saving changes to quiz:', quizData);
-  alert('Zmiany zostały zapisane!');
-  // Wracanie do strony quizu
+  submitQuiz();
+  alert("Zmiany zostały zapisane")
   router.back();
 };
 
@@ -446,6 +460,62 @@ const cancelAction = () => {
     : router.back();
   }
 };
+
+const deleteEntireQuiz = async () => {
+  console.log(quizId.value);
+  if (!quizId.value) return;
+
+  const confirmed = confirm('Czy na pewno chcesz usunąć ten quiz? Tej operacji nie można cofnąć.');
+
+  if (!confirmed) return;
+
+  try {
+    await axios.delete(`/quizes/${quizId.value}`);
+    alert('Quiz został usunięty.');
+    router.push('/');
+  } catch (err: any) {
+    console.error(err);
+    alert('Wystąpił błąd podczas usuwania quizu.');
+  }
+};
+
+const submitQuiz = async () => {
+  try {
+    const payload = formatQuizPayload();
+
+    const response = await axios.post('/quizzes', payload);
+
+  } catch (err: any) {
+    console.error(err);
+
+    if (err.response && err.response.data?.message) {
+      alert(err.response.data.message);
+    } else {
+      alert('Błąd podczas zapisu quizu.');
+    }
+  }
+};
+
+const formatQuizPayload = () => {
+  return {
+    quizId: isEditMode.value ? Number(quizId.value) : undefined,
+    title: quizData.title,
+    description: quizData.description,
+    is_public: true,
+    questions: quizData.questions.map(q => ({
+      content: q.text,
+      answers: q.answers.map((answer, idx) => ({
+        content: answer,
+        is_correct: idx === q.correctAnswer
+      })),
+      partial_points: false,
+      negative_points: false,
+      max_points: quizData.pointsPerQuestion
+    }))
+  };
+};
+
+
 </script>
 
 <style scoped>
@@ -503,6 +573,20 @@ const cancelAction = () => {
 .edit-description-button:hover {
   transform: scale(1.05) !important;
   box-shadow: 0 0 10px rgba(59, 130, 246, 0.5) !important;
+}
+.delete-quiz-button {
+  background-color: #7f1d1d !important;
+  color: white !important;
+  border-radius: 12px !important;
+  padding: 5px 22px !important;
+  font-size: 16px !important;
+  font-weight: bold !important;
+  height: 50px !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.delete-quiz-button:hover {
+  background-color: #991b1b !important;
 }
 
 .action-button {

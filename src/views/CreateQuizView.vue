@@ -145,10 +145,8 @@ import {
   Checkmark as CheckmarkIcon
 } from '@vicons/ionicons5';
 import { useRouter } from 'vue-router';
-import { useQuizStore } from '@/stores/quizStore';
 
 const router = useRouter();
-const quizStore = useQuizStore();
 
 // Types
 interface QuizData {
@@ -239,16 +237,15 @@ const proceedToNext = () => {
     return;
   }
   
-  errorMessage.value = '';
+  //errorMessage.value = '';
   //successMessage.value = 'Przechodzimy do następnego kroku!';
   
-  quizStore.setBasicData({
-    title: quizData.title.trim(),
-    description: quizData.description.trim(),
-    image: quizData.image,
-  });
-
-  router.push({ name: 'quiz-questions', query: { mode: 'create' } });
+  router.push({ name: 'quiz-questions', query: {
+    mode: 'create',
+    title: quizData.title,
+    description: quizData.description,
+    image: quizData.image
+  }});
   
 };
 </script>

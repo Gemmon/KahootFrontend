@@ -18,4 +18,5 @@ export const useAuthStore = defineStore('auth', {
       this.token = ''
     },
   },
+  persist: true
 })

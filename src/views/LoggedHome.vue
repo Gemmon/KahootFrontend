@@ -45,15 +45,17 @@
                     <div class="quiz-card" v-for="(quiz, index) in chunk" :key="'liked-'+chunkIndex+'-'+index" >
                       <div class="quiz-image" :style="{ backgroundImage: `url(${quiz.image})` }">
                         <div class="quiz-actions">
-                          <n-button quaternary circle>
+                          <n-button quaternary circle @click="toggleLike(quiz)">
                             <template #icon>
-                              <n-icon><HeartFilled /></n-icon>
+                              <n-icon>
+                                <component :is="quiz.is_liked ? HeartFilled : HeartOutline" />
+                              </n-icon>
                             </template>
                           </n-button>
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
-                        <n-button class="start-btn" block type="primary" @click="goToQuiz(index)">
-                          Start 
+                        <n-button class="start-btn" block type="primary" @click="goToQuiz(quiz.id)">
+                          Start
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
                           </template>
@@ -127,14 +129,16 @@
                     <div class="quiz-card" v-for="(quiz, index) in chunk" :key="'suggested-'+chunkIndex+'-'+index">
                       <div class="quiz-image" :style="{ backgroundImage: `url(${quiz.image})` }">
                         <div class="quiz-actions">
-                          <n-button quaternary circle>
+                          <n-button quaternary circle @click="toggleLike(quiz)">
                             <template #icon>
-                              <n-icon><HeartOutline /></n-icon>
+                              <n-icon>
+                                <component :is="quiz.is_liked ? HeartFilled : HeartOutline" />
+                              </n-icon>
                             </template>
                           </n-button>
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
-                        <n-button class="start-btn" block type="primary">
+                        <n-button class="start-btn" block type="primary" @click="goToQuiz(quiz.id)">
                           Start 
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
@@ -207,14 +211,16 @@
                     <div class="quiz-card" v-for="(quiz, index) in chunk" :key="'your-'+chunkIndex+'-'+index">
                       <div class="quiz-image" :style="{ backgroundImage: `url(${quiz.image})` }">
                         <div class="quiz-actions">
-                          <n-button quaternary circle>
+                          <n-button quaternary circle @click="toggleLike(quiz)">
                             <template #icon>
-                              <n-icon><HeartOutline /></n-icon>
+                              <n-icon>
+                                <component :is="quiz.is_liked ? HeartFilled : HeartOutline" />
+                              </n-icon>
                             </template>
                           </n-button>
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
-                        <n-button class="start-btn" block type="primary">
+                        <n-button class="start-btn" block type="primary" @click="goToQuiz(quiz.id)">
                           Start 
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
@@ -300,11 +306,12 @@ import { HeartFilled } from '@vicons/antd';
 import router from '@/router';
 import { useGameStore } from '@/stores/gameStore';
 const gameStore = useGameStore();
+
 // Reactive state
 const showJoinModal = ref(false);
-const likedSort = ref('Najnowsze');
-const suggestedSort = ref('Najnowsze');
-const yourSort = ref('Najnowsze');
+const likedSort = ref('created_at');
+const suggestedSort = ref('created_at');
+const yourSort = ref('created_at');
 
 // Pagination
 const likedCurrentPage = ref(0);
@@ -337,7 +344,6 @@ const handleJoin = async () => {
 const likedSortOptions = [
   { label: 'Najnowsze', value: 'created_at' },  // na podstawie created_at z tabeli Quizzes
   { label: 'Alfabetycznie', value: 'title' },   // na podstawie title z tabeli Quizzes
-  { label: 'Ocena', value: 'rating' }           // średnia z tabeli Ratings gdzie quiz_id = id quizu
 ];
 
 const suggestedSortOptions = [
@@ -348,8 +354,7 @@ const suggestedSortOptions = [
 
 const yourSortOptions = [
   { label: 'Najnowsze', value: 'created_at' },  // na podstawie created_at z tabeli Quizzes
-  { label: 'Alfabetycznie', value: 'title' },   // na podstawie title z tabeli Quizzes
-  { label: 'Ocena', value: 'rating' }           // średnia z tabeli Ratings gdzie quiz_id = id quizu
+  { label: 'Alfabetycznie', value: 'title' },   // na podstawie title z tabeli Quizzes     
 ];
 
 const likedQuizzes = ref([]);
@@ -416,15 +421,17 @@ watch(yourSort, () => {
 
 
 const goToQuiz = (id: number): void => {
-  console.log("KLIK KLIK");
-  router.push({ name: 'individual', query: { mine: "true"} });
+  console.log("Przekazuje id " + id);
+  router.push({ name: 'individual', query: { quizId: id} });
 };
 
 // Helper function to chunk an array into smaller arrays
 const chunkArray = (array: any[], size: number) => {
   const chunked = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunked.push(array.slice(i, i + size));
+  if(array){
+    for (let i = 0; i < array.length; i += size) {
+      chunked.push(array.slice(i, i + size));
+    }
   }
   return chunked;
 };
@@ -468,6 +475,22 @@ const goToPage = (section: any, pageIndex: number) => {
 const toggleJoinModal = () => {
   showJoinModal.value = !showJoinModal.value;
 };
+
+const toggleLike = async (quiz: any) => {
+  try {
+    if (quiz.is_liked) {
+      await axios.delete(`/quizes/${quiz.id}/favourite`);
+      quiz.is_liked = false;
+    } else {
+      await axios.post(`/quizes/${quiz.id}/favourite`);
+      quiz.is_liked = true;
+    }
+  } catch (err: any) {
+    console.error('Błąd przy toggle like:', err);
+    alert("Wystąpił błąd przy próbie polubienia quizu")
+  }
+};
+
 
 // Pobranie wszystkich potrzebnych danych przy wczytaniu strony
 onMounted(() => {
