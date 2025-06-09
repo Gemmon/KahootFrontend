@@ -300,9 +300,9 @@ import { HeartFilled } from '@vicons/antd';
 import router from '@/router';
 // Reactive state
 const showJoinModal = ref(false);
-const likedSort = ref('Najnowsze');
-const suggestedSort = ref('Najnowsze');
-const yourSort = ref('Najnowsze');
+const likedSort = ref('created_at');
+const suggestedSort = ref('created_at');
+const yourSort = ref('created_at');
 
 // Pagination
 const likedCurrentPage = ref(0);
@@ -314,7 +314,6 @@ const itemsPerPage = 4; // Number of cards visible at once
 const likedSortOptions = [
   { label: 'Najnowsze', value: 'created_at' },  // na podstawie created_at z tabeli Quizzes
   { label: 'Alfabetycznie', value: 'title' },   // na podstawie title z tabeli Quizzes
-  { label: 'Ocena', value: 'rating' }           // średnia z tabeli Ratings gdzie quiz_id = id quizu
 ];
 
 const suggestedSortOptions = [
@@ -325,8 +324,7 @@ const suggestedSortOptions = [
 
 const yourSortOptions = [
   { label: 'Najnowsze', value: 'created_at' },  // na podstawie created_at z tabeli Quizzes
-  { label: 'Alfabetycznie', value: 'title' },   // na podstawie title z tabeli Quizzes
-  { label: 'Ocena', value: 'rating' }           // średnia z tabeli Ratings gdzie quiz_id = id quizu
+  { label: 'Alfabetycznie', value: 'title' },   // na podstawie title z tabeli Quizzes     
 ];
 
 const likedQuizzes = ref([]);

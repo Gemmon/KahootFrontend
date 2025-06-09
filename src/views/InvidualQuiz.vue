@@ -168,6 +168,7 @@ import {
 import { HeartFilled } from '@vicons/antd';
 import router from '@/router';
 import axios from 'axios';
+import { quizStore } from '@/stores/quizStore';
 
 // Get route params
 const route = useRoute();
@@ -203,7 +204,6 @@ const quiz = reactive({
   }>
 });
 
-// Computed property for current question
 const currentQuestion = computed(() => {
   if (!quiz.questions.length) return null;
   return quiz.questions[currentQuestionIndex.value];
@@ -231,7 +231,6 @@ const fetchQuiz = async () => {
       isOwner: data.isOwner,
       ownerId: data.ownerId,
       questions: data.questions.map((question: any) => {
-        // Find correct answer index if we're the owner
         let correctAnswer = undefined;
         if (data.isOwner && question.answers) {
           correctAnswer = question.answers.findIndex((answer: any) => answer.is_correct);
@@ -264,7 +263,7 @@ const fetchQuiz = async () => {
 // Methods
 const toggleLike = () => {
   isLiked.value = !isLiked.value;
-  // TODO: Send like/unlike request to backend
+  // TODO: Send like/unlike request to backend Nie ma endpointu
 };
 
 const startQuiz = () => {
@@ -275,8 +274,8 @@ const startQuiz = () => {
 };
 
 const editQuiz = () => {
-  // Przechodzenie do edycji pytań quizu
-  router.push({ name: 'quiz-questions', query: { mode: 'edit', id: quiz.id } });
+  quizStore.currentQuiz = JSON.parse(JSON.stringify(quiz));
+  router.push({ name: 'quiz-questions', query: { mode: 'edit' } });
 };
 
 const selectAnswer = (index: number) => {
@@ -299,7 +298,7 @@ const goBack = () => {
   router.back();
 };
 
-// Load quiz data on component mount
+
 onMounted(() => {
   fetchQuiz();
 });
@@ -732,7 +731,18 @@ onMounted(() => {
   background-color: rgba(255, 255, 255, 0.1) !important;
 }
 
-/* Responsive adjustments */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: calc(100vh - 60px);
+  background-color: #222;
+  color: white;
+  text-align: center;
+  gap: 16px;
+}
+
 @media (max-width: 768px) {
   .quiz-view {
     flex-direction: column;

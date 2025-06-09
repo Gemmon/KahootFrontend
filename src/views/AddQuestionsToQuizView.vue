@@ -259,6 +259,7 @@ import {
 import router from '@/router';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
+import { quizStore } from '@/stores/quizStore';
 
 const route = useRoute();
 
@@ -300,6 +301,28 @@ const currentQuestionData = computed(() => {
 
 // Initialize data based on mode
 onMounted(() => {
+  if (isEditMode.value && quizStore.currentQuiz) {
+    // Pobierz dane quizu z quizStore
+    const quiz = quizStore.currentQuiz;
+
+    // Podstawowe dane
+    editForm.title = quiz.title;
+    editForm.description = quiz.description;
+    editForm.image = quiz.image;
+
+    quizData.title = quiz.title;
+    quizData.description = quiz.description;
+    quizData.image = quiz.image;
+
+    // Pytania
+    quizData.questions = quiz.questions.map((question: any) => ({
+      text: question.text,
+      image: question.image || '',
+      correctAnswer: question.correctAnswer ?? 0,
+      answers: question.answers.map((a: any) => a.text)
+    }));
+  } else {
+    // Tryb tworzenia nowego quizu — ustaw dane z route
     editForm.title = String(route.query.title || '');
     editForm.description = String(route.query.description || '');
     editForm.image = String(route.query.image || '');
@@ -307,7 +330,12 @@ onMounted(() => {
     quizData.title = editForm.title;
     quizData.description = editForm.description;
     quizData.image = editForm.image;
+  }
 
+  if (isEditMode.value && !quizStore.currentQuiz) {
+  alert('Brak danych quizu do edycji. Przejdź ponownie przez ekran główny.');
+  router.push('/');
+}
 });
 
 // Methods
@@ -401,22 +429,16 @@ const validateQuiz = () => {
 // Do dodania nowego quizu
 const publishQuiz = () => {
   if (!validateQuiz()) return;
-  
   submitQuiz();
-
-  console.log('Publishing quiz:', quizData);
-  alert('Quiz został opublikowany!');
+  alert("Quiz został opublikowany")
   router.push("/");
 };
 
 // Do edytowania istniejąceo quizu
 const saveChanges = () => {
   if (!validateQuiz()) return;
-  
   submitQuiz();
-
-  console.log('Saving changes to quiz:', quizData);
-  alert('Zmiany zostały zapisane!');
+  alert("Zmiany zostały zapisane")
   router.back();
 };
 
@@ -440,8 +462,6 @@ const submitQuiz = async () => {
 
     const response = await axios.post('/quizzes', payload);
 
-    alert(isEditMode.value ? 'Quiz zaktualizowany!' : 'Quiz opublikowany!');
-    router.push('/');
   } catch (err: any) {
     console.error(err);
 
