@@ -83,6 +83,7 @@ const handleSelect = (key: string) => {
     
     case 'login':
       goToLogin()
+      break
 
     case 'settings':
       goToSettings()
