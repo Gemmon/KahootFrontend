@@ -1,5 +1,5 @@
 <template>
-  <div class="quiz-view">
+  <div class="quiz-view" v-if="!loading">
     <main class="main-content">
       <div class="quiz-container">
         <!-- Quiz Header Section -->
@@ -8,7 +8,7 @@
           <h1 class="quiz-title">{{ quiz.title }}</h1>
           
           <div class="quiz-actions">
-            <n-button quaternary circle class="like-button" :class="{ 'liked': isLiked }" @click="toggleLike" v-if="!mine">
+            <n-button quaternary circle class="like-button" :class="{ 'liked': isLiked }" @click="toggleLike" v-if="!quiz.isOwner">
               <template #icon>
                 <n-icon>
                   <component :is="isLiked ? HeartFilled : HeartOutline" />
@@ -23,7 +23,7 @@
               </template>
             </n-button>
 
-            <n-button type="warning" class="edit-button" @click="editQuiz" v-if="mine">
+            <n-button type="warning" class="edit-button" @click="editQuiz" v-if="quiz.isOwner">
               Edit
               <template #icon>
                 <n-icon><EditIcon /></n-icon>
@@ -39,7 +39,7 @@
         </div>
         
         <!-- Question Display Section -->
-        <div class="question-section" :style="{ backgroundImage: `url(${quiz.image})` }">
+        <div class="question-section" v-if="currentQuestion" :style="{ backgroundImage: `url(${quiz.image})` }">
           <div class="question-container">
             <div class="question-text">{{ currentQuestion.text }}</div>
             
@@ -49,13 +49,13 @@
                 :key="index"
                 class="answer-card"
                 :class="{ 
-                  'selected': mine ? currentQuestion.correctAnswer === index : selectedAnswer === index,
-                  'disabled': mine
+                  'selected': quiz.isOwner ? currentQuestion.correctAnswer === index : selectedAnswer === index,
+                  'disabled': quiz.isOwner
                 }"
-                @click="!mine && selectAnswer(index)"
+                @click="!quiz.isOwner && selectAnswer(index)"
               >
                 <div class="answer-label">{{ ['A', 'B', 'C', 'D'][index] }}</div>
-                <div class="answer-text">{{ answer }}</div>
+                <div class="answer-text">{{ answer.text }}</div>
               </div>
             </div>
           </div>
@@ -72,7 +72,7 @@
                 </div>
               </div>
               
-              <div class="rating-section" v-if="!mine">
+              <div class="rating-section" v-if="!quiz.isOwner">
                 <h3>Ocena</h3>
                 <div class="stars-display">
                   <n-rate v-model:value="quiz.rating" readonly />
@@ -121,7 +121,7 @@
           class="question-nav-item"
           :class="{ 
             'active': currentQuestionIndex === index,
-            'completed': !mine && completedQuestions.includes(index)
+            'completed': !quiz.isOwner && completedQuestions.includes(index)
           }"
           @click="navigateToQuestion(index)"
         >
@@ -132,16 +132,31 @@
       
     </div>
   </div>
+  
+  <!-- Loading state -->
+  <div v-else class="loading-container">
+    <n-spin size="large" />
+    <p>Ładowanie quizu...</p>
+  </div>
+  
+  <!-- Error state -->
+  <div v-if="error" class="error-container">
+    <n-alert title="Błąd" type="error" :description="error" />
+    <n-button @click="fetchQuiz">Spróbuj ponownie</n-button>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed } from 'vue';
+import { ref, reactive, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 import { 
   NCard, 
   NButton, 
   NAvatar, 
   NIcon,
-  NRate
+  NRate,
+  NSpin,
+  NAlert
 } from 'naive-ui';
 import { 
   Heart as HeartOutline, 
@@ -152,80 +167,104 @@ import {
 } from '@vicons/ionicons5';
 import { HeartFilled } from '@vicons/antd';
 import router from '@/router';
-// Test variable 
-const mine = ref(true);
+import axios from 'axios';
+
+// Get route params
+const route = useRoute();
 
 // Reactive state
+const loading = ref(true);
+const error = ref<string | null>(null);
 const isLiked = ref(false);
 const currentQuestionIndex = ref<number>(0);
 const selectedAnswer = ref<number | null>(null);
-const completedQuestions = ref<number[]>([])
+const completedQuestions = ref<number[]>([]);
 const userRating = ref(0);
 
-// Mock data for the quiz
+// Quiz data structure
 const quiz = reactive({
-  id: 1,
-  title: 'Star Wars',
-  image: 'https://placehold.co/600x400/0000FF/FFFFFF?text=Star%20Wars',
+  id: 0,
+  title: '',
+  description: '',
+  image: 'https://placehold.co/600x400/0000FF/FFFFFF?text=Quiz',
   authorAvatar: '/api/placeholder/50/50',
-  description: 'To jest przykładowy opis quizu. Możesz przeczytać ten opis, aby dowiedzieć się więcej o tym quizie.',
-  rating: 3,
-  questions: [
-    {
-      id: 1,
-      text: 'Przykładowe pytanie?',
-      answers: [
-        'Przykładowa odpowiedź',
-        'Przykładowa odpowiedź',
-        'Przykładowa odpowiedź',
-        'Przykładowa odpowiedź'
-      ],
-      correctAnswer: 0
-    },
-    {
-      id: 2,
-      text: 'Drugie pytanie quizu?',
-      answers: [
-        'Odpowiedź A',
-        'Odpowiedź B',
-        'Odpowiedź C',
-        'Odpowiedź D'
-      ],
-      correctAnswer: 1
-    },
-    {
-      id: 3,
-      text: 'Trzecie pytanie quizu?',
-      answers: [
-        'Odpowiedź 1',
-        'Odpowiedź 2',
-        'Odpowiedź 3',
-        'Odpowiedź 4'
-      ],
-      correctAnswer: 2
-    },
-    {
-      id: 4,
-      text: 'Czwarte pytanie quizu?',
-      answers: [
-        'Pierwsza odpowiedź',
-        'Druga odpowiedź',
-        'Trzecia odpowiedź',
-        'Czwarta odpowiedź'
-      ],
-      correctAnswer: 3
-    }
-  ]
+  rating: 0,
+  isOwner: false,
+  ownerId: 0,
+  questions: [] as Array<{
+    id: number;
+    text: string;
+    answers: Array<{
+      id?: number;
+      text: string;
+      is_correct?: boolean;
+    }>;
+    correctAnswer?: number;
+  }>
 });
 
 // Computed property for current question
 const currentQuestion = computed(() => {
+  if (!quiz.questions.length) return null;
   return quiz.questions[currentQuestionIndex.value];
 });
+
+// Fetch quiz data from backend
+const fetchQuiz = async () => {
+  try {
+    loading.value = true;
+    error.value = null;
+    
+    const quizId = route.query.quizId;
+    if (!quizId) {
+      throw new Error('Brak ID quizu');
+    }
+
+    const response = await axios.get(`/quizes/${quizId}`);
+    const data = response.data.quiz;
+    
+    // Update quiz data
+    Object.assign(quiz, {
+      id: data.quizId,
+      title: data.title,
+      description: data.description,
+      isOwner: data.isOwner,
+      ownerId: data.ownerId,
+      questions: data.questions.map((question: any) => {
+        // Find correct answer index if we're the owner
+        let correctAnswer = undefined;
+        if (data.isOwner && question.answers) {
+          correctAnswer = question.answers.findIndex((answer: any) => answer.is_correct);
+        }
+        
+        return {
+          id: question.id,
+          text: question.content,
+          answers: (question.answers || []).map((a: any) => ({
+            id: a.id,
+            text: a.content,
+            is_correct: a.is_correct
+          })),
+          correctAnswer
+        };
+      })
+    });
+    
+    console.log(quiz);
+
+
+  } catch (err: any) {
+    console.error('Error fetching quiz:', err);
+    error.value = err.response?.data?.message || err.message || 'Wystąpił błąd podczas ładowania quizu';
+  } finally {
+    loading.value = false;
+  }
+};
 
 // Methods
 const toggleLike = () => {
   isLiked.value = !isLiked.value;
+  // TODO: Send like/unlike request to backend
 };
 
 const startQuiz = () => {
@@ -236,10 +275,8 @@ const startQuiz = () => {
 };
 
 const editQuiz = () => {
-
   // Przechodzenie do edycji pytań quizu
-  router.push({ name: 'quiz-questions', query: { mode: 'edit', id: 123 } })
-
+  router.push({ name: 'quiz-questions', query: { mode: 'edit', id: quiz.id } });
 };
 
 const selectAnswer = (index: number) => {
@@ -250,9 +287,11 @@ const selectAnswer = (index: number) => {
 };
 
 const navigateToQuestion = (index: number) => {
-  currentQuestionIndex.value = index;
-  if (!mine.value) {
-    selectedAnswer.value = null;
+  if (index >= 0 && index < quiz.questions.length) {
+    currentQuestionIndex.value = index;
+    if (!quiz.isOwner) {
+      selectedAnswer.value = null;
+    }
   }
 };
 
@@ -260,6 +299,10 @@ const goBack = () => {
   router.back();
 };
 
+// Load quiz data on component mount
+onMounted(() => {
+  fetchQuiz();
+});
 </script>
 
 <style scoped>

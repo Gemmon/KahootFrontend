@@ -52,7 +52,7 @@
                           </n-button>
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
-                        <n-button class="start-btn" block type="primary" @click="goToQuiz(index)">
+                        <n-button class="start-btn" block type="primary" @click="goToQuiz(quiz.id)">
                           Start
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
@@ -134,7 +134,7 @@
                           </n-button>
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
-                        <n-button class="start-btn" block type="primary" @click="goToQuiz(index)">
+                        <n-button class="start-btn" block type="primary" @click="goToQuiz(quiz.id)">
                           Start 
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
@@ -214,7 +214,7 @@
                           </n-button>
                         </div>
                         <div class="quiz-title">{{ quiz.title }}</div>
-                        <n-button class="start-btn" block type="primary" @click="goToQuiz(index)">
+                        <n-button class="start-btn" block type="primary" @click="goToQuiz(quiz.id)">
                           Start 
                           <template #icon>
                             <n-icon><PlayIcon /></n-icon>
@@ -393,14 +393,17 @@ watch(yourSort, () => {
 
 
 const goToQuiz = (id: number): void => {
+  console.log("Przekazuje id " + id);
   router.push({ name: 'individual', query: { mine: "true", quizId: id} });
 };
 
 // Helper function to chunk an array into smaller arrays
 const chunkArray = (array: any[], size: number) => {
   const chunked = [];
-  for (let i = 0; i < array.length; i += size) {
-    chunked.push(array.slice(i, i + size));
+  if(array){
+    for (let i = 0; i < array.length; i += size) {
+      chunked.push(array.slice(i, i + size));
+    }
   }
   return chunked;
 };

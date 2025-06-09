@@ -258,6 +258,7 @@ import {
 } from '@vicons/ionicons5';
 import router from '@/router';
 import { useRoute } from 'vue-router';
+import axios from 'axios';
 
 const route = useRoute();
 
@@ -401,8 +402,8 @@ const validateQuiz = () => {
 const publishQuiz = () => {
   if (!validateQuiz()) return;
   
-  
-  // Dodać wysyłanie gdy będzie endpoint z pytaniami
+  submitQuiz();
+
   console.log('Publishing quiz:', quizData);
   alert('Quiz został opublikowany!');
   router.push("/");
@@ -412,6 +413,8 @@ const publishQuiz = () => {
 const saveChanges = () => {
   if (!validateQuiz()) return;
   
+  submitQuiz();
+
   console.log('Saving changes to quiz:', quizData);
   alert('Zmiany zostały zapisane!');
   router.back();
@@ -429,6 +432,47 @@ const cancelAction = () => {
     : router.back();
   }
 };
+
+
+const submitQuiz = async () => {
+  try {
+    const payload = formatQuizPayload();
+
+    const response = await axios.post('/quizzes', payload);
+
+    alert(isEditMode.value ? 'Quiz zaktualizowany!' : 'Quiz opublikowany!');
+    router.push('/');
+  } catch (err: any) {
+    console.error(err);
+
+    if (err.response && err.response.data?.message) {
+      alert(err.response.data.message);
+    } else {
+      alert('Błąd podczas zapisu quizu.');
+    }
+  }
+};
+
+const formatQuizPayload = () => {
+  return {
+    quizId: isEditMode.value ? Number(quizId.value) : undefined,
+    title: quizData.title,
+    description: quizData.description,
+    is_public: true,
+    questions: quizData.questions.map(q => ({
+      content: q.text,
+      answers: q.answers.map((answer, idx) => ({
+        content: answer,
+        is_correct: idx === q.correctAnswer
+      })),
+      partial_points: false,
+      negative_points: false,
+      max_points: quizData.pointsPerQuestion
+    }))
+  };
+};
+
+
 </script>
 
 <style scoped>
