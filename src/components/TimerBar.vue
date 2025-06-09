@@ -17,7 +17,7 @@
       <div class="bar-text">
         {{ showResult
           ? isCorrect
-            ? 'Zdobyłeś 1000 punktów.'
+            ? `Zdobyłeś ${earnedPoints} punktów.`
             : 'Nie zdobyłeś żadnych punktów.'
           : timeRemaining + ' sekund'
         }}
@@ -33,11 +33,15 @@ const props = defineProps<{
   timeRemaining: number;
   timeLimit: number;
   showResult: boolean;
-  isCorrect: boolean;
+  earnedPoints: number;
 }>();
 
 const progressPercent = computed(() => {
   return (props.timeRemaining / props.timeLimit) * 100;
+});
+
+const isCorrect = computed(() => {
+  return props.earnedPoints > 0;
 });
 </script>
 

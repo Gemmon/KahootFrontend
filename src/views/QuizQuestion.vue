@@ -3,33 +3,32 @@
     <section class="quiz-content">
       <div class="quiz-container">
         <div class="quiz-header">
-          <h1 class="quiz-title">{{ title }}</h1>
-          <p class="question-counter">Pytanie {{ questionNumber }}/{{ totalQuestions }}</p>
+          <h1 class="quiz-title">{{ gameStore.quiz?.title }}</h1>
+          <p class="question-counter">Pytanie {{ gameStore.questionNumber }}/{{ gameStore.quiz?.Question.length ?? 0 }}</p>
         </div>
 
         <div class="quiz-main">
           <div class="quiz-columns">
             <div class="question-column">
-              <QuestionCard
-                :question="question"
-                :answers="answers"
-                :backgroundImage="backgroundImage"
-                :selectedAnswerId="selectedAnswerId"
-                :correctAnswerId="correctAnswerId"
+              <QuestionCard v-if="question"
+                :question="question.content || ''"
+                :answers="question.Answer"
+                :backgroundImage="''"
+                v-model="selectedAnswerId"
                 :showResult="showResult"
-                @answerSelected="(id) => selectedAnswerId = id"
+                @answerSelected="sendAnswer"
               />
             </div>
             <div class="image-column">
               <div class="right-image-container">
                 <AnswerDistribution
                   v-if="showResult"
-                  :answers="answers"
-                  :votes="mockVotes"
+                  :answers="question?.Answer || []"
+                  :votes="gameStore.distribution"
                   :correctAnswerId="correctAnswerId"
                   :selectedAnswerId="selectedAnswerId"
                 />
-                <img v-else :src="rightImage" alt="" class="right-image" />
+                <!-- <img v-else :src="''" alt="" class="right-image" /> -->
               </div>
             </div>
           </div>
@@ -38,7 +37,7 @@
           :timeRemaining="timeRemaining" 
           :timeLimit="TIME_LIMIT" 
           :showResult="showResult"
-          :isCorrect="selectedAnswerId === correctAnswerId"
+          :earned-points="earnedPoints"
         />
       </div>
     </section>
@@ -46,69 +45,45 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, onMounted, onBeforeUnmount } from 'vue';
+import { ref, watch, onMounted, onBeforeUnmount, computed } from 'vue';
 import QuestionCard from '../components/QuestionCard.vue';
 import AnswerDistribution from '../components/AnswerDistribution.vue';
 import TimerBar from '../components/TimerBar.vue';
+import { useGameStore } from '@/stores/gameStore';
+import { useRouter } from 'vue-router';
 
-const selectedAnswerId = ref<string | null>(null);
-const correctAnswerId = 'C'; // na razie na sztywno, potem z backu
+const gameStore = useGameStore();
+const router = useRouter();
+if (gameStore.socket === null) {
+  router.push('/')
+}
+
+const selectedAnswerId = ref<number | null>(null);
 const showResult = ref(false);
+const question = computed(() => gameStore.currentQuestion);
+const correctAnswerId = computed(() => {
+  const correctAnswer = gameStore.currentQuestion?.Answer.find(a => a.is_correct);
+  return correctAnswer ? correctAnswer.id : -1;
+});
 
-const TIME_LIMIT = 15; // Możecie zmniejszyć jak cierpliwość małą
-
-defineProps<{
-  title: string;
-  questionNumber: number;
-  totalQuestions: number;
-  question: string;
-  answers: {
-    id: string;
-    text: string;
-  }[];
-  timeRemaining: number;
-  backgroundImage: string;
-  rightImage: string;
-}>();
-
-
-const mockProps = {
-  title: 'Geografia Świata',
-  questionNumber: 3,
-  totalQuestions: 10,
-  question: 'Które z poniższych miast jest stolicą Francji?',
-  answers: [
-    { id: 'A', text: 'Berlin' },
-    { id: 'B', text: 'Madryt' },
-    { id: 'C', text: 'Paryż' },
-    { id: 'D', text: 'Rzym' },
-  ],
-  timeRemaining: ref(TIME_LIMIT),
-  backgroundImage: '/assets/Paris.jpg',
-  rightImage: '/assets/Paris.jpg',
-};
-
-const {
-  title,
-  questionNumber,
-  totalQuestions,
-  question,
-  answers,
-  timeRemaining,
-  backgroundImage,
-  rightImage,
-} = mockProps;
+const TIME_LIMIT = parseInt(import.meta.env.VITE_QUESTION_ANSWER_TIME) || 15;
+const RESULTS_TIME_LIMIT = parseInt(import.meta.env.VITE_QUESTION_RESULT_TIME) || 5;
+const timeRemaining = ref(TIME_LIMIT);
+const earnedPoints = ref(0);
 
 let timerId: number | undefined;
 
-const mockVotes = {
-  A: 5,
-  B: 2,
-  C: 9,
-  D: 0,
-};
-
 onMounted(() => {
+  startTimer();
+});
+
+onBeforeUnmount(() => {
+  clearInterval(timerId);
+});
+
+function startTimer() {
+  timeRemaining.value = TIME_LIMIT;
+  clearInterval(timerId);
   timerId = setInterval(() => {
     if (timeRemaining.value > 0) {
       timeRemaining.value--;
@@ -116,19 +91,42 @@ onMounted(() => {
       clearInterval(timerId);
     }
   }, 1000);
-});
-
-onBeforeUnmount(() => {
-  clearInterval(timerId);
-});
-
+}
 
 watch(timeRemaining, (newVal) => {
   if (newVal === 0) {
     showResult.value = true;
+    if (gameStore.hosting) {
+      setTimeout(() => {
+        gameStore.nextQuestion();
+      }, RESULTS_TIME_LIMIT * 1000);
+    }
   }
 });
 
+watch(() => gameStore.questionNumber, (newQuestion) => {
+  if (newQuestion) {
+    selectedAnswerId.value = null;
+    showResult.value = false;
+    earnedPoints.value = 0;
+    startTimer();
+  }
+});
+
+watch(() => gameStore.state, (newState) => {
+  if (newState === 'finished') {
+    if (gameStore.hosting)
+      router.push('/final-ranking-host')
+    else
+      router.push('/final-ranking-guest');
+  }
+})
+
+async function sendAnswer() {
+  if (selectedAnswerId.value !== null) {
+    earnedPoints.value = await gameStore.sendAnswer(selectedAnswerId.value);
+  }
+}
 </script>
 
 <style scoped>

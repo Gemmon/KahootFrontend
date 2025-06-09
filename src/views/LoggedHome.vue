@@ -260,15 +260,15 @@
         :bordered="false"
         size="huge"
         role="dialog"
-        title="Enter Code"
+        title="Podaj kod gry"
       >
-        <n-input placeholder="Code" />
+        <n-input placeholder="Kod" v-model:value="joinCode" />
         <n-text type="error" style="display: block; text-align: center; margin-top: 10px;">
-          Invalid game!
+          {{ errorMessage }}
         </n-text>
         <template #footer>
-          <n-button type="primary" block @click="showJoinModal = false">
-            Join
+          <n-button type="primary" block @click="handleJoin">
+            Dołącz
           </n-button>
         </template>
       </n-card>
@@ -298,6 +298,8 @@ import {
 } from '@vicons/ionicons5';
 import { HeartFilled } from '@vicons/antd';
 import router from '@/router';
+import { useGameStore } from '@/stores/gameStore';
+const gameStore = useGameStore();
 // Reactive state
 const showJoinModal = ref(false);
 const likedSort = ref('Najnowsze');
@@ -309,6 +311,27 @@ const likedCurrentPage = ref(0);
 const suggestedCurrentPage = ref(0);
 const yourCurrentPage = ref(0);
 const itemsPerPage = 4; // Number of cards visible at once
+
+const errorMessage = ref('');
+const joinCode = ref('');
+
+const handleJoin = async () => {
+  if (joinCode.value.trim()) {
+    console.log(`Dołączanie do gry: ${joinCode.value}`)
+    errorMessage.value = ''
+    try {
+      await gameStore.joinGame(joinCode.value.trim())
+      console.log('Dołączono do gry:', joinCode.value)
+      router.push('/lobby-guest')
+    }
+    catch (error) {
+      console.error('Błąd podczas dołączania:', error)
+      errorMessage.value = 'Błąd podczas dołączania:' + error
+    }
+  } else {
+    errorMessage.value = 'Nie podano kodu!'
+  }
+}
 
 
 const likedSortOptions = [
