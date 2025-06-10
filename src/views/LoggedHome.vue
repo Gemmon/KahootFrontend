@@ -48,7 +48,8 @@
                           <n-button quaternary circle @click="toggleLike(quiz)">
                             <template #icon>
                               <n-icon>
-                                <component :is="quiz.is_liked ? HeartFilled : HeartOutline" />
+                                <HeartIcon v-if="quiz.isLiked" style="color: #ff4757;" />
+                                <HeartOutlineIcon v-else style="color: #747d8c;" />
                               </n-icon>
                             </template>
                           </n-button>
@@ -132,7 +133,8 @@
                           <n-button quaternary circle @click="toggleLike(quiz)">
                             <template #icon>
                               <n-icon>
-                                <component :is="quiz.is_liked ? HeartFilled : HeartOutline" />
+                                <HeartIcon v-if="quiz.isLiked" style="color: #ff4757;" />
+                                <HeartOutlineIcon v-else style="color: #747d8c;" />
                               </n-icon>
                             </template>
                           </n-button>
@@ -214,7 +216,8 @@
                           <n-button quaternary circle @click="toggleLike(quiz)">
                             <template #icon>
                               <n-icon>
-                                <component :is="quiz.is_liked ? HeartFilled : HeartOutline" />
+                                <HeartIcon v-if="quiz.isLiked" style="color: #ff4757;" />
+                                <HeartOutlineIcon v-else style="color: #747d8c;" />
                               </n-icon>
                             </template>
                           </n-button>
@@ -297,7 +300,8 @@ import {
   NText
 } from 'naive-ui';
 import { 
-  Heart as HeartOutline, 
+  Heart as HeartIcon,
+  HeartOutline as HeartOutlineIcon,
   Play as PlayIcon,
   ChevronBack as ChevronBackIcon,
   ChevronForward as ChevronForwardIcon
@@ -476,15 +480,22 @@ const toggleJoinModal = () => {
   showJoinModal.value = !showJoinModal.value;
 };
 
+
+// Poprawka w funkcji toggleLike
 const toggleLike = async (quiz: any) => {
   try {
-    if (quiz.is_liked) {
+    if (quiz.isLiked) {
       await axios.delete(`/quizes/${quiz.id}/favourite`);
-      quiz.is_liked = false;
+      quiz.isLiked = false;
     } else {
       await axios.post(`/quizes/${quiz.id}/favourite`);
-      quiz.is_liked = true;
+      quiz.isLiked = true;
     }
+
+    fetchLikedQuizzes();
+    fetchSuggestedQuizzes();
+    fetchYourQuizzes();
+
   } catch (err: any) {
     console.error('Błąd przy toggle like:', err);
     alert("Wystąpił błąd przy próbie polubienia quizu")

@@ -173,7 +173,6 @@ const route = useRoute();
 import { useGameStore } from '@/stores/gameStore';
 
 // Test variable 
-const mine = ref(true);
 const gameStore = useGameStore();
 
 // Reactive state
@@ -225,7 +224,7 @@ const fetchQuiz = async () => {
 
     const response = await axios.get(`/quizes/${quizId}`);
     const data = response.data.quiz;
-    
+    isLiked.value = data.isLiked
     // Update quiz data
     Object.assign(quiz, {
       id: data.quizId,
