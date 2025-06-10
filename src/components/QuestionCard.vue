@@ -134,11 +134,30 @@ function selectAnswer(id: number) {
   height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: center;
   padding: 10px 10px;
-  max-height: calc(100vh - 50px);
   box-sizing: border-box;
+
+  overflow-y: auto; /* <-- DODANE */
   overflow-x: hidden;
+}
+
+.question-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.question-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.question-content::-webkit-scrollbar-thumb {
+  background-color: #888; /* ciemniejszy kolor */
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+.question-content:hover::-webkit-scrollbar-thumb {
+  background-color: #aaa; /* jaśniejszy po najechaniu */
 }
 
 .question-text {
@@ -146,12 +165,15 @@ function selectAnswer(id: number) {
   box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.5);
   background-color: #17a935;
   padding: 24px 20px;
-  overflow: hidden;
   font-family: "Libre Franklin", -apple-system, Roboto, Helvetica, sans-serif;
   font-size: large;
   color: #fff;
   font-weight: 600;
   margin: 0;
+  overflow-wrap: break-word;
+  white-space: normal;
+  overflow: visible;
+  word-break: break-word;
 }
 
 .answers-grid {
@@ -167,19 +189,23 @@ function selectAnswer(id: number) {
   gap: 20px;
   width: 100%;
   margin: 0;
+  align-items: stretch;
 }
 
 .answer-column {
   width: calc(50% - 10px); /* 2 kolumny, uwzględniając gap */
   box-sizing: border-box;
+  display: flex;
 }
 
 .answer-option {
   border-radius: 12px;
   box-shadow: 4px 4px 4px 0 rgba(0, 0, 0, 0.5);
   background-color: #b7adad;
+  flex-grow: 1;
   display: flex;
   flex-direction: column;
+  
   padding: 0 18px 10px;
   overflow: hidden;
   font-family: "Libre Franklin", -apple-system, Roboto, Helvetica, sans-serif;
@@ -189,12 +215,17 @@ function selectAnswer(id: number) {
 }
 
 .option-letter {
-  font-size:xx-large;
+  font-size: xx-large;
+  flex-shrink: 0;
+  width: 24px;
 }
 
 .option-text {
   font-size: large;
   margin-bottom: 0;
+  flex-grow: 1;
+  white-space: normal;
+  word-break: break-word;
 }
 
 @media (max-width: 991px) {
