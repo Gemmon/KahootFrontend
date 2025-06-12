@@ -2,22 +2,22 @@
   <div class="main">
     <n-card class="quiz-section" content-style="padding: 0">
       <div class="quiz-section-header">
-        <h3>Quiz Explorer</h3>
-        <h4>Search, sort and filter for quizzes you want to play</h4>
+        <h3>Znajdz quizy.</h3>
+        <h4>Wybierz quiz, który zmieni twoje życie!</h4>
 
         <div class="toolbar-container">
-          <div id="search">
+          <!-- <div id="search">
             <n-input placeholder="Search..." v-model:value="SearchFor" size="small" :clearable="true" />
-          </div>
+          </div> -->
           <div id="dropdown-options">
             <div class="dropdown" id="sort">
               <span>Sort by:</span>
               <n-select v-model:value="SortBy" :options="SortOptions" size="small" />
             </div>
-            <div class="dropdown" id="filter">
+            <!-- <div class="dropdown" id="filter">
               <span>Filter by:</span>
               <n-select v-model:value="FilterBy" :options="FilterOptions" size="small" />
-            </div>
+            </div> -->
           </div>
         </div>
       </div>
@@ -28,7 +28,7 @@
             <div class="cards-page" :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
               <div class="quiz-card" v-for="(quiz, index) in activeChunk"
                 :key="'quiz-' + CurrentPage + '-' + index">
-                <QuizCard :imageURL="quiz.image" :title="quiz.title" />
+                <QuizCard :quiz="quiz" :imageURL="quiz.image" :title="quiz.title" :id="quiz.id" @start="goToQuiz" @like="toggleLike"/>
               </div>
             </div>
           </div>
@@ -68,8 +68,8 @@
 
 
 <script setup lang="ts">
-
-import { ref, computed } from 'vue'
+import axios from 'axios';
+import { ref, computed,watch,onMounted } from 'vue'
 import {
   NCard,
   NButton,
@@ -85,21 +85,21 @@ import {
 import { ChevronBack as ChevronBackIcon, ChevronForward as ChevronForwardIcon } from '@vicons/ionicons5';
 
 import QuizCard from '@/components/QuizCard.vue';
-
+import { useRoute, useRouter } from 'vue-router';
+const router = useRouter()
 const SearchFor = ref("");
-const SortBy = ref("Alphabetical");
+const SortBy = ref("Alfabetycznie");
 const SortOptions = [
-  { label: 'Popularity', value: 'popularity' },
-  { label: 'Reviews', value: 'reviews' },
-  { label: 'Recently Added', value: 'recent' },
-  { label: 'Alphabetical', value: 'alphabetical' }
+  { label: 'Czas dodania', value: 'created_at' },
+  { label: 'Oceny', value: 'likes' },
+  { label: 'Alfabetycznie', value: 'title' }
 ];
-const FilterBy = ref("Category");
-const FilterOptions = [
-  { label: 'Category', value: 'category' },
-  { label: 'Recently Added', value: 'recent' },
-  { label: 'Alphabetical', value: 'alphabetical' }
-];
+// const FilterBy = ref("Category");
+// const FilterOptions = [
+//   { label: 'Category', value: 'category' },
+//   { label: 'Recently Added', value: 'recent' },
+//   { label: 'Alphabetical', value: 'alphabetical' }
+// ];
 
 // Pagination state
 const CurrentPage = ref(0);
@@ -107,30 +107,12 @@ const itemsPerRow = ref(3);
 const itemsPerColumn = ref(3);
 
 // Quiz data - static for testing
-const Quizzes = ref([
-  { title: 'Star Wars', image: 'https://placehold.co/300x150/0000FF/FFFFFF?text=Star%20Wars' },
-  { title: 'Marvel', image: 'https://placehold.co/300x150/FF0000/FFFFFF?text=Marvel' },
-  { title: 'DC Comics', image: 'https://placehold.co/300x150/00FF00/FFFFFF?text=DC%20Comics' },
-  { title: 'Harry Potter', image: 'https://placehold.co/300x150/FFFF00/000000?text=Harry%20Potter' },
-  { title: 'Lord of the Rings', image: 'https://placehold.co/300x150/FF00FF/FFFFFF?text=LOTR' },
-  { title: 'Game of Thrones', image: 'https://placehold.co/300x150/00FFFF/000000?text=GoT' },
-  { title: 'Breaking Bad', image: 'https://placehold.co/300x150/FFFFFF/000000?text=Breaking%20Bad' },
-  { title: 'Stranger Things', image: 'https://placehold.co/300x150/888888/FFFFFF?text=Stranger%20Things' },
-  { title: 'The Office', image: 'https://placehold.co/300x150/123456/FFFFFF?text=The%20Office' },
+const Quizzes = ref([]);
 
-  { title: 'Geography', image: 'https://placehold.co/300x150/0000FF/FFFFFF?text=Geography' },
-  { title: 'Science', image: 'https://placehold.co/300x150/FF0000/FFFFFF?text=Science' },
-  { title: 'History', image: 'https://placehold.co/300x150/00FF00/FFFFFF?text=History' },
-  { title: 'Literature', image: 'https://placehold.co/300x150/FFFF00/000000?text=Literature' },
-  { title: 'Music', image: 'https://placehold.co/300x150/FF00FF/FFFFFF?text=Music' },
-  { title: 'Movies', image: 'https://placehold.co/300x150/00FFFF/000000?text=Movies' },
-  { title: 'Sports', image: 'https://placehold.co/300x150/FFFFFF/000000?text=Sports' },
-  { title: 'JavaScript', image: 'https://placehold.co/300x150/F7DF1E/000000?text=JavaScript' },
-  { title: 'Python', image: 'https://placehold.co/300x150/3776AB/FFFFFF?text=Python' },
-  
-  
-]);
-
+const goToQuiz = (id: number): void => {
+  console.log("Przekazuje id " + id);
+  router.push({ name: 'individual', query: { quizId: id} });
+};
 
 // Helper function to chunk an array into smaller arrays
 const chunkArray = (array: any[], size: number) => {
@@ -147,7 +129,20 @@ const activeChunk = computed(() => QuizChunks.value[CurrentPage.value]);
 
 
 const transitionDirection = ref<'left' | 'right'>('left');
-
+const toggleLike = async (quiz: any) => {
+  try {
+    if (quiz.isLiked) {
+      await axios.delete(`/quizes/${quiz.id}/favourite`);
+      quiz.isLiked = false;
+    } else {
+      await axios.post(`/quizes/${quiz.id}/favourite`);
+      quiz.isLiked = true;
+    }
+  } catch (err: any) {
+    console.error('Błąd przy toggle like:', err);
+    alert("Wystąpił błąd przy próbie polubienia quizu")
+  }
+};
 // Navigation methods
 const nextPage = () => {
   if (CurrentPage.value < QuizChunks.value.length - 1) {
@@ -173,6 +168,31 @@ const goToPage = (pageIndex: number) => {
 };
 
 
+const fetchSuggestedQuizzes = async () => {
+  try {
+    const limit = 12;
+    const offset = 0;
+
+    const res = await axios.get(
+      `/quizes/suggested?sort_by=${SortBy.value}&limit=${limit}&offset=${offset}`
+    );
+    Quizzes.value = res.data.data;
+    CurrentPage.value = 0;
+  } catch (err) {
+    console.error("Błąd podczas pobierania sugerowanych quizów:", err);
+  }
+};
+
+
+
+watch(SortBy, () => {
+  fetchSuggestedQuizzes();
+});
+
+
+onMounted(() => {
+  fetchSuggestedQuizzes();
+});
 </script>
 
 

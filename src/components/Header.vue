@@ -4,12 +4,12 @@
       <div class="logo" @click="goToHome">
         <span class="logo-letter">G</span>
       </div>
-      <nav class="main-nav" v-if="props.isLogged">
+      <nav class="main-nav">
         <n-button class="nav-btn" quaternary type="primary" @click="goToCreateQuiz">
           <template #icon>
             <n-icon><AddIcon /></n-icon>
           </template>
-          Create
+          Stwórz
         </n-button>
         <!-- Join Button with custom dropdown -->
         <n-popover 
@@ -23,7 +23,7 @@
           <template #trigger>
             <n-button class="nav-btn" quaternary type="primary">
               <template #icon><n-icon><PersonAddIcon /></n-icon></template>
-              Join
+              Dołącz
             </n-button>
           </template>
           <div class="join-popover-content">
@@ -38,9 +38,9 @@
             <n-button type="primary" class="join-button" @click="handleJoin">Dołącz</n-button>
           </div>
         </n-popover>
-        <n-button @click="goToExplore" class="nav-btn" quaternary type="primary">
+        <n-button @click="goToExplore" class="nav-btn" quaternary type="primary"v-if="authStore.isAuthenticated">
           <template #icon><n-icon><CompassOutlineIcon /></n-icon></template>
-          Explore
+          Znajdź quizy
         </n-button>
       </nav>
     </div>
@@ -51,6 +51,9 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
 import { ref } from 'vue'
 import { useRouter } from 'vue-router';
 import Avatar from '@/components/Avatar.vue'
