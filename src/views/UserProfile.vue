@@ -32,24 +32,24 @@
 
                 <div class="prof-user-stats-main f-child">
                     <n-card title="Statystyki użytkownika" class="prof-user-stats-content">
-                            <div class="stats-blocks">
-                                <n-card class="stat" title="Liczba zagranych gier">
-                                    <n-spin v-if="isStatsLoading" :show="isStatsLoading"></n-spin>
-                                    <strong v-else>{{ userStats?.gamesPlayed}}</strong>
-                                </n-card>
-                                <n-card class="stat" title="Liczba wygranych gier">
-                                    <n-spin v-if="isStatsLoading" :show="isStatsLoading"></n-spin>
-                                    <strong v-else>{{ userStats?.gamesWon}}</strong>
-                                </n-card>
-                                <n-card class="stat" title="Liczba stworzonych gier">
-                                    <n-spin v-if="isStatsLoading" :show="isStatsLoading"></n-spin>
-                                    <strong v-else>{{ userStats?.gamesMade}}</strong>
-                                </n-card>
-                                <n-card class="stat" title="Średnia oceń quizów">
-                                    <n-spin v-if="isStatsLoading" :show="isStatsLoading"></n-spin>
-                                    <strong v-else>{{ userStats?.avgQuizRate}}</strong>
-                                </n-card>
-                            </div>
+                        <div class="stats-blocks">
+                            <n-card class="stat" title="Liczba zagranych gier">
+                                <n-spin v-if="isStatsLoading" :show="isStatsLoading"></n-spin>
+                                <strong v-else>{{ userStats?.gamesPlayed }}</strong>
+                            </n-card>
+                            <n-card class="stat" title="Liczba wygranych gier">
+                                <n-spin v-if="isStatsLoading" :show="isStatsLoading"></n-spin>
+                                <strong v-else>{{ userStats?.gamesWon }}</strong>
+                            </n-card>
+                            <n-card class="stat" title="Liczba stworzonych gier">
+                                <n-spin v-if="isStatsLoading" :show="isStatsLoading"></n-spin>
+                                <strong v-else>{{ userStats?.gamesMade }}</strong>
+                            </n-card>
+                            <n-card class="stat" title="Średnia oceń quizów">
+                                <n-spin v-if="isStatsLoading" :show="isStatsLoading"></n-spin>
+                                <strong v-else>{{ userStats?.avgQuizRate }}</strong>
+                            </n-card>
+                        </div>
                         <div class="quizes-created">
                             <n-card title="Twoje Quizy" class="quiz-section">
                                 <div class="toolbar-container">
@@ -68,8 +68,8 @@
 
 
                                 <div v-if="isQuizzesLoading" class="quiz-spinner-container">
-  <n-spin size="large" />
-</div>
+                                    <n-spin size="large" />
+                                </div>
                                 <div v-else class="quiz-cards-container">
                                     <div v-if="yourQuizzes.length === 0" class="no-quizzes-message">
                                         Brak quizów
@@ -80,7 +80,7 @@
                                                 :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
                                                 <div class="quiz-card f-child" v-for="(quiz, index) in activeChunk"
                                                     :key="'quiz-' + yourQuizzesPage + '-' + index">
-                                                    <QuizCard :imageURL="quiz.image" :title="quiz.title" />
+                                                    <QuizCard :imageURL="quiz.image" :title="quiz.title" @like="toggleLike" :quiz="quiz" @start="goToQuiz" :id="quiz.id" />
                                                 </div>
                                             </div>
                                         </div>
@@ -125,6 +125,7 @@
 
 
 <script setup lang="ts">
+import axios from 'axios';
 import { ref, computed } from 'vue'
 import { NCard, NAvatar, NIcon, NButton, NSelect, NInput, NSpin } from 'naive-ui';
 import QuizCard from '@/components/QuizCard.vue'
@@ -148,14 +149,43 @@ const toggleEditProfile = () => {
     isEditingProfile.value = !isEditingProfile.value;
 };
 
-const saveProfileChanges = () => {
-    if (editableName.value.trim()) {
-        userName.value = editableName.value.trim();
+const saveProfileChanges = async () => {
+    const payload: { name?: string; avatar?: string } = {};
+
+    if (editableName.value.trim() && editableName.value !== userName.value) {
+        payload.name = editableName.value.trim();
     }
-    isEditingProfile.value = false;
+
+    if (avatarImage.value) {
+        payload.avatar = avatarImage.value;
+    }
+
+    if (!payload.name && !payload.avatar) {
+        alert("Brak zmian do zapisania.");
+        return;
+    }
+
+    try {
+        const res = await axios.put('/me', payload);
+
+        if (res.data.success) {
+            if (payload.name) userName.value = payload.name;
+            isEditingProfile.value = false;
+            alert("Dane profilu zostały zaktualizowane.");
+        } else {
+            alert("Aktualizacja nie powiodła się.");
+        }
+    } catch (err) {
+        console.error("Błąd podczas zapisywania zmian profilu:", err);
+        alert("Wystąpił błąd podczas aktualizacji profilu.");
+    }
 };
 
-
+const router = useRouter()
+const goToQuiz = (id: number): void => {
+  console.log("Przekazuje id " + id);
+  router.push({ name: 'individual', query: { quizId: id} });
+};
 interface Stats {
     gamesPlayed: number
     gamesWon: number
@@ -170,7 +200,7 @@ const isQuizzesLoading = ref(true);
 
 const userStats = ref<Stats | null>(null)
 const yourQuizzesPage = ref(0);
-const yourQuizChunks = computed(() => chunkArray(yourQuizzes, (itemsPerRow.value * itemsPerColumn.value)));
+const yourQuizChunks = computed(() => chunkArray(yourQuizzes.value, (itemsPerRow.value * itemsPerColumn.value)));
 const activeChunk = computed(() => yourQuizChunks.value[yourQuizzesPage.value]);
 const itemsPerRow = ref(3);
 const itemsPerColumn = ref(1);
@@ -182,17 +212,7 @@ const SortOptions = [
     { label: 'Popularne', value: 'popularity' }  //  można obliczyć na podstawie liczby Game_players/Games dla danego quiz_id
 ];
 
-const yourQuizzes = [
-    { title: 'Geography', image: 'https://placehold.co/300x150/0000FF/FFFFFF?text=Geography' },
-    { title: 'Science', image: 'https://placehold.co/300x150/FF0000/FFFFFF?text=Science' },
-    { title: 'History', image: 'https://placehold.co/300x150/00FF00/FFFFFF?text=History' },
-    { title: 'Literature', image: 'https://placehold.co/300x150/FFFF00/000000?text=Literature' },
-    { title: 'Music', image: 'https://placehold.co/300x150/FF00FF/FFFFFF?text=Music' },
-    { title: 'Movies', image: 'https://placehold.co/300x150/00FFFF/000000?text=Movies' },
-    { title: 'Sports', image: 'https://placehold.co/300x150/FFFFFF/000000?text=Sports' },
-    { title: 'JavaScript', image: 'https://placehold.co/300x150/F7DF1E/000000?text=JavaScript' },
-    { title: 'Python', image: 'https://placehold.co/300x150/3776AB/FFFFFF?text=Python' },
-]
+const yourQuizzes = ref([]);
 
 const chunkArray = (array: any[], size: number) => {
     const chunked = [];
@@ -227,9 +247,45 @@ const goToPage = (pageIndex: number) => {
 };
 
 
-import { onMounted } from 'vue'
 
-onMounted(() => {
+const fetchYourQuizzes = async () => {
+  try {
+    const limit = 12;
+    const offset = 0;
+
+    const res = await axios.get(
+      `/quizes/own?sort_by=${SortBy.value}&limit=${limit}&offset=${offset}`
+    );
+
+    yourQuizzes.value = res.data.data;
+    yourQuizzesPage.value = 0;
+  } catch (err) {
+    console.error("Błąd podczas pobierania Twoich quizów:", err);
+  }
+};
+const toggleLike = async (quiz: any) => {
+  try {
+    if (quiz.isLiked) {
+      await axios.delete(`/quizes/${quiz.id}/favourite`);
+      quiz.isLiked = false;
+    } else {
+      await axios.post(`/quizes/${quiz.id}/favourite`);
+      quiz.isLiked = true;
+    }
+
+    fetchYourQuizzes();
+
+  } catch (err: any) {
+    console.error('Błąd przy toggle like:', err);
+    alert("Wystąpił błąd przy próbie polubienia quizu")
+  }
+};
+
+
+import { onMounted } from 'vue'
+import { useRouter } from 'vue-router';
+
+onMounted(async () => {
     setTimeout(() => {
         userStats.value = {
             gamesPlayed: 20,
@@ -239,11 +295,10 @@ onMounted(() => {
         };
         isStatsLoading.value = false;
     }, 1000);
-
-    setTimeout(() => {
-        // Replace with your real fetching logic
+        await fetchYourQuizzes()
         isQuizzesLoading.value = false;
-    }, 1500);
+
+
 });
 
 
@@ -326,7 +381,7 @@ strong {
     background-color: #322E38;
     border-radius: 10px;
     text-align: center;
-    word-break:keep-all;
+    word-break: keep-all;
 }
 
 .f-child {
@@ -498,10 +553,11 @@ strong {
 }
 
 .quiz-spinner-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 200px; /* or whatever height makes sense visually */
-  width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 200px;
+    /* or whatever height makes sense visually */
+    width: 100%;
 }
 </style>

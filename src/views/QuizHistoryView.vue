@@ -15,7 +15,7 @@
         <!-- Pojedyncza strona quizów -->
         <div class="cards-page" :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
           <div class="quiz-card" v-for="(quiz, index) in activeChunk" :key="index">
-            <QuizCard :imageURL="quiz.image" :title="quiz.title" @start="startQuiz(quiz)" />
+            <QuizCard :quiz="quiz" :id="quiz.id" :imageURL="quiz.image" :title="quiz.title" @start="startQuiz(quiz)" />
           </div>
         </div>
       </div>

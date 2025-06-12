@@ -3,8 +3,8 @@
     <n-card class="quiz-section" content-style="padding: 0">
       <div class="quiz-section-header">
         <div class="title-quotes">
-          <h3>View quizzes or Join friends!</h3>
-          <h4>Search for interesting quizzes or enter a code to join your friends in a lobby!</h4>
+          <h3>Przeglądaj quizy lub dołącz do znajomych!</h3>
+          <h4>Wyszukaj interesujące quizy lub wpisz kod, aby dołączyć do znajomych w lobby!</h4>
         </div>
         <div id="join-container">
           <h3 class="join-title">Podaj kod gry</h3>
@@ -18,18 +18,18 @@
         </div>
       </div>
       <div class="toolbar-container">
-        <div id="search">
+        <!-- <div id="search">
           <n-input placeholder="Search..." v-model:value="SearchFor" size="small" :clearable="true" />
-        </div>
+        </div> -->
         <div id="dropdown-options">
           <div class="dropdown" id="sort">
-            <span>Sort by:</span>
+            <span>Sortuj:</span>
             <n-select v-model:value="SortBy" :options="SortOptions" size="small" />
           </div>
-          <div class="dropdown" id="filter">
+          <!-- <div class="dropdown" id="filter">
             <span>Filter by:</span>
             <n-select v-model:value="FilterBy" :options="FilterOptions" size="small" />
-          </div>
+          </div> -->
         </div>
       </div>
 
@@ -39,7 +39,7 @@
             <div class="cards-page" :style="{ '--itemsPerRow': itemsPerRow, '--itemsPerColumn': itemsPerColumn }">
               <div class="quiz-card" v-for="(quiz, index) in activeChunk"
                 :key="'quiz-' + CurrentPage + '-' + index">
-                <QuizCard :imageURL="quiz.image" :title="quiz.title" @click="goToQuiz(quiz.id)"/>
+                <QuizCard :quiz="quiz" :id="quiz.id" :imageURL="quiz.image" :title="quiz.title" @click="goToQuiz(quiz.id)"/>
               </div>
             </div>
           </div>
@@ -80,7 +80,7 @@
 
 <script setup lang="ts">
 
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted,watch } from 'vue'
 import {
   NCard,
   NButton,
@@ -94,7 +94,7 @@ import {
   NText
 } from 'naive-ui';
 import { ChevronBack as ChevronBackIcon, ChevronForward as ChevronForwardIcon } from '@vicons/ionicons5';
-
+import axios from 'axios';
 import QuizCard from '@/components/QuizCard.vue';
 import { useRouter } from 'vue-router';
 import { useGameStore } from '@/stores/gameStore';
@@ -105,6 +105,21 @@ const router = useRouter();
 const goToCreateLobby = (quiz: any) => {
   router.push({ name: 'create-lobby', query: { title: quiz.title, image: quiz.image } });
 }
+
+const fetchQuizzes = async () => {
+  try {
+    const limit = 12;
+    const offset = 0;
+
+    const res = await axios.get(
+      `/quizes?limit=${limit}&offset=${offset}`
+    );
+    Quizzes.value = res.data.data;
+    CurrentPage.value = 0;
+  } catch (err) {
+    console.error("Błąd podczas pobierania sugerowanych quizów:", err);
+  }
+};
 
 const joinCode = ref('')
 const errorMessage = ref('')
@@ -125,20 +140,19 @@ const handleJoin = async () => {
     errorMessage.value = 'Nie podano kodu!'
   }
 }
-const SearchFor = ref("");
-const SortBy = ref("Alphabetical");
+// const SearchFor = ref("");
+const SortBy = ref("title");
 const SortOptions = [
-  { label: 'Popularity', value: 'popularity' },
-  { label: 'Reviews', value: 'reviews' },
-  { label: 'Recently Added', value: 'recent' },
-  { label: 'Alphabetical', value: 'alphabetical' }
+  { label: 'Najnowsze', value: 'created_at' }, // na podstawie created_at z tabeli Quizzes
+  { label: 'Alfabetycznie', value: 'title' },  // na podstawie title z tabeli Quizzes
+  { label: 'Popularne', value: 'popularity' }  //  można obliczyć na podstawie liczby Game_players/Games dla danego quiz_id
 ];
-const FilterBy = ref("Category");
-const FilterOptions = [
-  { label: 'Category', value: 'category' },
-  { label: 'Recently Added', value: 'recent' },
-  { label: 'Alphabetical', value: 'alphabetical' }
-];
+// const FilterBy = ref("Category");
+// const FilterOptions = [
+//   { label: 'Category', value: 'category' },
+//   { label: 'Recently Added', value: 'recent' },
+//   { label: 'Alphabetical', value: 'alphabetical' }
+// ];
 
 // Pagination state
 const CurrentPage = ref(0);
@@ -146,32 +160,11 @@ const itemsPerRow = ref(3);
 const itemsPerColumn = ref(3);
 
 // Quiz data - static for testing
-const Quizzes = ref([
-  { title: 'Star Wars', image: 'https://placehold.co/300x150/0000FF/FFFFFF?text=Star%20Wars' },
-  { title: 'Marvel', image: 'https://placehold.co/300x150/FF0000/FFFFFF?text=Marvel' },
-  { title: 'DC Comics', image: 'https://placehold.co/300x150/00FF00/FFFFFF?text=DC%20Comics' },
-  { title: 'Harry Potter', image: 'https://placehold.co/300x150/FFFF00/000000?text=Harry%20Potter' },
-  { title: 'Lord of the Rings', image: 'https://placehold.co/300x150/FF00FF/FFFFFF?text=LOTR' },
-  { title: 'Game of Thrones', image: 'https://placehold.co/300x150/00FFFF/000000?text=GoT' },
-  { title: 'Breaking Bad', image: 'https://placehold.co/300x150/FFFFFF/000000?text=Breaking%20Bad' },
-  { title: 'Stranger Things', image: 'https://placehold.co/300x150/888888/FFFFFF?text=Stranger%20Things' },
-  { title: 'The Office', image: 'https://placehold.co/300x150/123456/FFFFFF?text=The%20Office' },
-
-  { title: 'Geography', image: 'https://placehold.co/300x150/0000FF/FFFFFF?text=Geography' },
-  { title: 'Science', image: 'https://placehold.co/300x150/FF0000/FFFFFF?text=Science' },
-  { title: 'History', image: 'https://placehold.co/300x150/00FF00/FFFFFF?text=History' },
-  { title: 'Literature', image: 'https://placehold.co/300x150/FFFF00/000000?text=Literature' },
-  { title: 'Music', image: 'https://placehold.co/300x150/FF00FF/FFFFFF?text=Music' },
-  { title: 'Movies', image: 'https://placehold.co/300x150/00FFFF/000000?text=Movies' },
-  { title: 'Sports', image: 'https://placehold.co/300x150/FFFFFF/000000?text=Sports' },
-  { title: 'JavaScript', image: 'https://placehold.co/300x150/F7DF1E/000000?text=JavaScript' },
-  { title: 'Python', image: 'https://placehold.co/300x150/3776AB/FFFFFF?text=Python' },
-  
-  
-]);
+const Quizzes = ref([]);
 
 const goToQuiz = (id: number): void => {
-  router.push({ name: 'individual', query: { mine: "true"} });
+  console.log("Przekazuje id " + id);
+  router.push({ name: 'individual', query: { quizId: id} });
 };
 
 // Helper function to chunk an array into smaller arrays
@@ -214,6 +207,14 @@ const goToPage = (pageIndex: number) => {
   CurrentPage.value = pageIndex;
 };
 
+watch(SortBy, () => {
+  fetchQuizzes();
+});
+
+onMounted(async () =>{
+  await fetchQuizzes()
+})
+
 
 </script>
 
@@ -240,6 +241,7 @@ const goToPage = (pageIndex: number) => {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
+  align-items: center;
 }
 
 #join-container{
