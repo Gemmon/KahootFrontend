@@ -112,7 +112,7 @@ const dissolveLobby = () => {
   console.log('Rozwiązano lobby')
 }
 const startNewGame = () => {
-  router.push('/lobby-create')
+  router.push('/create-lobby')
 }
 </script>
 
