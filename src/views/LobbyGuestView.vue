@@ -64,7 +64,7 @@ const store = useGameStore()
 if (store.socket === null) {
   router.push('/')
 }
-const quizImage = computed(() => `https://placehold.co/300x150/0000FF/FFFFFF?text=${encodeURIComponent(quizTitle.value)}`);
+const quizImage = computed(() => store.quiz?.image || '');
 const quizTitle = computed(() => store.quiz?.title || 'Gahut Quiz');
 
 function leaveLobby() {

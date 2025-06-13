@@ -4,29 +4,29 @@
         <n-form ref="registerFormRef" :model="formValue" :rules="formRules">
             <n-form-item label="Email" path="email" :feedback="emailFeedback"
                 :validation-status="emailStatus">
-            <n-input v-model:value="formValue.email" placeholder="Enter your email" clearable
+            <n-input v-model:value="formValue.email" placeholder="Wpisz email" clearable
                 @keydown.enter="handleRegister" />
             </n-form-item>
 
             <n-form-item label="Username" path="username" :feedback="usernameFeedback"
                 :validation-status="usernameStatus">
-                <n-input v-model:value="formValue.username" placeholder="Enter your username" clearable
+                <n-input v-model:value="formValue.username" placeholder="Wpisz nazwę" clearable
                     @keydown.enter="handleRegister" />
             </n-form-item>
 
             <n-form-item label="Password" path="password">
-                <n-input v-model:value="formValue.password" type="password" placeholder="Enter your password"
+                <n-input v-model:value="formValue.password" type="password" placeholder="Wpisz hasło"
                     show-password-on="click" clearable @keydown.enter="handleRegister" />
             </n-form-item>
         </n-form>
 
         <div class="under-buttons">
             <n-button color="black" @click="handleRegister" :loading="isLoading">
-                Sign Up
+                Zarejestruj się
             </n-button>
-            <span class="or-text">or</span>
+            <span class="or-text">lub</span>
             <n-button text @click="handleLoginClick" class="login-link">
-                Already have an account? Log in
+                Masz już konto? zaloguj się
             </n-button>
         </div>
     </div>
@@ -36,7 +36,7 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import type { FormInst } from 'naive-ui'
-import { NFormItem, NButton, NForm, NInput } from 'naive-ui'
+import { NFormItem, NButton, NForm, NInput, useNotification } from 'naive-ui'
 import axios from 'axios'
 import { useAuthStore } from '@/stores/auth'
 
@@ -58,16 +58,16 @@ const formValue = ref({
 
 const formRules = ref({
     email: [
-        { required: true, message: 'Email is required.', trigger: 'blur' },
-        { type: 'email' as const, message: 'Invalid email format.', trigger: 'blur' }
+        { required: true, message: 'Email jest wymagany.', trigger: 'blur' },
+        { type: 'email' as const, message: 'Nieprawydłowy email.', trigger: 'blur' }
     ],
     username: [
-        { required: true, message: 'Username is required.', trigger: 'blur' },
-        { min: 3, message: 'Minimum 3 characters.', trigger: 'blur' }
+        { required: true, message: 'Nazwa użytkownika jest wymagana.', trigger: 'blur' },
+        { min: 3, message: 'Minimum 3 znaki.', trigger: 'blur' }
     ],
     password: [
-        { required: true, message: 'Password is required.', trigger: 'blur' },
-        { min: 6, message: 'Password must be at least 6 characters.', trigger: 'blur' }
+        { required: true, message: 'Hasło jest wymagane.', trigger: 'blur' },
+        { min: 6, message: 'Hasło musi mieć minimum 6 znaków.', trigger: 'blur' }
     ]
 })
 
@@ -95,7 +95,10 @@ const handleRegister = async (e?: MouseEvent | KeyboardEvent) => {
                     authStore.setToken(response.data.token)
                     router.push('/')
                 } else {
-                    alert('Registration successful! You can now log in.')
+                    useNotification().success({
+                        title: 'Zarejestrowano pomyślnie!',
+                        content: 'Teraz możesz się zalogować'
+                    })
                     router.push('/login')
                 }
                 
@@ -104,9 +107,12 @@ const handleRegister = async (e?: MouseEvent | KeyboardEvent) => {
 
                 if (error.response?.status === 400 && error.response?.data?.message === "User already exists") {
                     emailStatus.value = 'error'
-                    emailFeedback.value = 'This email is already registered.'
+                    emailFeedback.value = 'Ten adres już jest zarejestrowany.'
                 } else {
-                    alert(error.response?.data?.message || 'Registration failed. Please try again.')
+                    useNotification().error({
+                        title: 'Wystąpił błąd',
+                        content: error.response?.data?.message || 'Rejestracja nie powiodła się, spróbuj ponownie.'
+                    })
                 }
             } finally {
                 isLoading.value = false

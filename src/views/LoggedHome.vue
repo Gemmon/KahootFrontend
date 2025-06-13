@@ -4,15 +4,15 @@
     <main class="main-content">
       <div class="quiz-collections">
         <div class="section-header">
-          <n-h2>Quiz Collections</n-h2>
-          <p>Find all quizzes you liked or made yourself.</p>
+          <n-h2>Quizy</n-h2>
+          <p>Znajdź polubione quizy lub stwórz własny</p>
         </div>
         
         <n-card class="quiz-section" content-style="padding: 0">
           <div class="quiz-section-header">
-            <n-h3>Liked Quizzes</n-h3>
+            <n-h3>Polubione quizy</n-h3>
             <div class="sort-dropdown">
-              <span>Sort by</span>
+              <span>Sortuj</span>
               <n-select 
                 v-model:value="likedSort" 
                 :options="likedSortOptions" 
@@ -96,9 +96,9 @@
         
         <n-card class="quiz-section" content-style="padding: 0">
           <div class="quiz-section-header">
-            <n-h3>Suggested Quizzes</n-h3>
+            <n-h3>Sugerowane quizy</n-h3>
             <div class="sort-dropdown">
-              <span>Sort by</span>
+              <span>Sortuj</span>
               <n-select 
                 v-model:value="suggestedSort" 
                 :options="suggestedSortOptions" 
@@ -179,9 +179,9 @@
         
         <n-card class="quiz-section" content-style="padding: 0">
           <div class="quiz-section-header">
-            <n-h3>Your Quizzes</n-h3>
+            <n-h3>Twoje quizy</n-h3>
             <div class="sort-dropdown">
-              <span>Sort by</span>
+              <span>Sortuj</span>
               <n-select 
                 v-model:value="yourSort" 
                 :options="yourSortOptions"

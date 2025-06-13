@@ -9,6 +9,7 @@ interface Quiz {
   likes: number;
   rating_avg: number;
   Question: Question[];
+  image?: string;
 }
 
 interface Question {

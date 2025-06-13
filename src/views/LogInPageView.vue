@@ -8,14 +8,14 @@
         <n-form-item label="Email" path="email">
           <n-input 
           v-model:value="formValue.email"
-          placeholder="Enter your email" 
+          placeholder="Wpisz email" 
           clearable 
           />
         </n-form-item>
         <n-form-item label="Password" path="password">
           <n-input 
           v-model:value="formValue.password" 
-          placeholder="Enter your password" 
+          placeholder="Wpisz hasło" 
           type="password"
           clearable
           />
@@ -24,15 +24,15 @@
       <div class="under-buttons">
         <div class="forgot-password">
           <n-button text @click="handleForgotPasswordClick">
-            Forgot Password?
+            Zapomniałeś hasła?
           </n-button>
         </div>
         <n-button color="black" @click="handleEnterClick">
-          Enter
+          Zaloguj
         </n-button>
         <span class="or-text">or</span>
         <n-button color="black" @click="handleSignUpClick">
-          Sign Up
+          Zarejestruj
         </n-button>
       </div>
       

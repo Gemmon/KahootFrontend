@@ -76,7 +76,7 @@ if (store.socket === null) {
 // Function to check if the user is a host or a special guest
 //const isHost = (user: string) => user === 'John Doe';
 
-const quizImage = computed(() => `https://placehold.co/300x150/0000FF/FFFFFF?text=${encodeURIComponent(quizTitle.value)}`);
+const quizImage = computed(() => store.quiz?.image || '');
 const quizTitle = computed(() => store.quiz?.title || 'Gahut Quiz');
 
 function leaveLobby() {
