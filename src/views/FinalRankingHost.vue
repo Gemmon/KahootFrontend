@@ -74,8 +74,8 @@
       </div>
 
       <div class="button-row">
-        <button class="danger-button" @click="dissolveLobby">Rozwiąż Lobby</button>
-        <button class="success-button" @click="startNewGame">Zacznij następną grę</button>
+        <button class="danger-button" @click="dissolveLobby">Wyjdź</button>
+        <!-- <button class="success-button" @click="startNewGame">Zacznij następną grę</button> -->
       </div>
     </div>
   </div>
@@ -110,6 +110,8 @@ const localUser = computed(() => {
 
 const dissolveLobby = () => {
   console.log('Rozwiązano lobby')
+  gameStore.reset();
+  router.push('/')
 }
 const startNewGame = () => {
   router.push('/create-lobby')

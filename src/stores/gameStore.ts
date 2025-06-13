@@ -59,7 +59,9 @@ export const useGameStore = defineStore('game', {
         transports: ['websocket', 'polling'],
         autoConnect: false,
         auth: {
-          username: this.username
+          username: this.username,
+          uuid: this.uuid,
+          gameId: this.gameId
         }
       })
       this.socket.on('player:connected', (uuid: string, username: string) => {

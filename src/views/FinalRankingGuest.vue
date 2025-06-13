@@ -90,7 +90,8 @@ const localUser = computed(() => {
 });
 
 const leaveLobby = () => {
-  router.push('/home')
+  gameStore.reset();
+  router.push('/')
 }
 const continuePlaying = () => {
   router.push('/quiz-select')

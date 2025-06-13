@@ -31,7 +31,7 @@
             <n-input 
               v-model:value="joinCode" 
               type="text" 
-              placeholder="Code" 
+              placeholder="Kod" 
               class="join-input"
             />
             <div v-if="errorMessage" class="error-message">{{ errorMessage }}</div>

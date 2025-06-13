@@ -11,7 +11,7 @@
             <n-input 
               v-model:value="joinCode" 
               type="text" 
-              :placeholder="errorMessage ? errorMessage : 'Code'" 
+              :placeholder="errorMessage ? errorMessage : 'Kod'" 
               class="join-input"
             />
             <n-button type="primary" class="join-button" @click="handleJoin">Dołącz</n-button>
